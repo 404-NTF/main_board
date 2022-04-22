@@ -47,7 +47,6 @@
 #include "INS_task.h"
 #include "led_flow_task.h"
 #include "oled_task.h"
-#include "referee_usart_task.h"
 #include "usb_task.h"
 #include "voltage_task.h"
 /* USER CODE END Includes */

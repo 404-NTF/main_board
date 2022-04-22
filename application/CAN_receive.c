@@ -74,12 +74,12 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     {
         case CAN_3508_M1_ID:
         case CAN_3508_M2_ID:
+        case CAN_3508_M3_ID:
+        case CAN_3508_M4_ID:
           if (hcan->Instance == CAN2)
           {
             break;
           }
-        case CAN_3508_M3_ID:
-        case CAN_3508_M4_ID:
         case CAN_YAW_MOTOR_ID:
         case CAN_PIT_MOTOR_ID:
         case CAN_TRIGGER_MOTOR_ID:
@@ -143,14 +143,14 @@ void CAN_cmd_fric(int16_t fric1, int16_t fric2)
     fric_tx_message.IDE = CAN_ID_STD;
     fric_tx_message.RTR = CAN_RTR_DATA;
     fric_tx_message.DLC = 0x08;
-    fric_can_send_data[0] = (fric1 >> 8);
-    fric_can_send_data[1] = fric1;
-    fric_can_send_data[2] = (fric2 >> 8);
-    fric_can_send_data[3] = fric2;
-    fric_can_send_data[4] = 0;
-    fric_can_send_data[5] = (0 >> 8);
+    fric_can_send_data[0] = 0;
+    fric_can_send_data[1] = 0;
+    fric_can_send_data[2] = fric1 >> 8;
+    fric_can_send_data[3] = fric1;
+    fric_can_send_data[4] = fric2 >> 8;
+    fric_can_send_data[5] = fric2;
     fric_can_send_data[6] = 0;
-    fric_can_send_data[7] = (0 >> 8);
+    fric_can_send_data[7] = 0;
     HAL_CAN_AddTxMessage(&FRIC_CAN, &fric_tx_message, fric_can_send_data, &send_mail_box);
 }
 

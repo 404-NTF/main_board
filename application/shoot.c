@@ -30,6 +30,8 @@
 #include "detect_task.h"
 #include "pid.h"
 
+#include "bsp_led.h"
+
 #define shoot_laser_on()    laser_on()      //激光开启宏定义
 #define shoot_laser_off()   laser_off()     //激光关闭宏定义
 //微动开关IO
@@ -88,7 +90,8 @@ void shoot_init(void)
     PID_init(&shoot_control.trigger_motor_pid, PID_POSITION, Trigger_speed_pid, TRIGGER_READY_PID_MAX_OUT, TRIGGER_READY_PID_MAX_IOUT);
     //更新数据
     shoot_feedback_update();
-    shoot_control.fric_mode = FRIC_MODE_OFF;
+    shoot_control.fric_mode = FRIC_MODE_STOP;
+    shoot_control.fric_off_time = 0;
     shoot_control.ecd_count = 0;
     shoot_control.angle = shoot_control.shoot_motor_measure->ecd * MOTOR_ECD_TO_ANGLE;
     shoot_control.given_current = 0;
@@ -115,23 +118,20 @@ int16_t shoot_control_loop(void)
         //设置拨弹轮的速度
         shoot_control.speed_set = 0.0f;
     }
-    else if(shoot_control.shoot_mode == SHOOT_READY_FRIC)
+    else if(shoot_control.shoot_mode == SHOOT_READY)
     {
-        //设置拨弹轮的拨动速度,并开启堵转反转处理
-        shoot_control.trigger_speed_set = READY_TRIGGER_SPEED;
-        trigger_motor_turn_back();
-        shoot_control.trigger_motor_pid.max_out = TRIGGER_READY_PID_MAX_OUT;
-        shoot_control.trigger_motor_pid.max_iout = TRIGGER_READY_PID_MAX_IOUT;
+        shoot_control.speed_set = 0.0f;
+        shoot_control.trigger_motor_pid.max_out = TRIGGER_BULLET_PID_MAX_OUT;
+        shoot_control.trigger_motor_pid.max_iout = TRIGGER_BULLET_PID_MAX_IOUT;
     }
-    else if (shoot_control.shoot_mode == SHOOT_READY)
+    else if (shoot_control.shoot_mode == SHOOT_BULLET_ONCE)
     {
-        //设置拨弹轮的速度
-         shoot_control.speed_set = 0.0f;
+        shoot_control.trigger_speed_set = ONCE_TRIGGER_SPEED;
+        shoot_bullet_control();
     }
     else if (shoot_control.shoot_mode == SHOOT_BULLET)
     {
-        shoot_control.trigger_motor_pid.max_out = TRIGGER_BULLET_PID_MAX_OUT;
-        shoot_control.trigger_motor_pid.max_iout = TRIGGER_BULLET_PID_MAX_IOUT;
+        shoot_control.trigger_speed_set = TRIGGER_SPEED;
         trigger_motor_turn_back();
     }
     else if (shoot_control.shoot_mode == SHOOT_CONTINUE_BULLET)
@@ -145,7 +145,10 @@ int16_t shoot_control_loop(void)
     {
         shoot_laser_off();
         shoot_control.given_current = 0;
-        shoot_control.fric_mode = FRIC_MODE_OFF;
+        if (shoot_control.fric_mode < FRIC_MODE_OFF)
+        {
+            shoot_control.fric_mode = FRIC_MODE_OFF;
+        }
     }
     else
     {
@@ -171,15 +174,31 @@ int16_t shoot_control_loop(void)
     switch (shoot_control.fric_mode)
     {
     case FRIC_MODE_LOW:
-        CAN_cmd_fric(-3000, 3000);
+        CAN_cmd_fric(3000, -3000);
         break;
     case FRIC_MODE_HIGH:
-        CAN_cmd_fric(-8000, 8000);
+        CAN_cmd_fric(8000, -8000);
         break;
     case FRIC_MODE_OFF:
-    default:
-        CAN_cmd_fric(10, 0);
+        CAN_cmd_fric(-200, 200);
+        if (shoot_control.fric_off_time == FRIC_STOP_TIME)
+        {
+            shoot_control.fric_mode = FRIC_MODE_STOP;
+        }
         break;
+    case FRIC_MODE_STOP:
+    default:
+        CAN_cmd_fric(0, 0);
+        break;
+    }
+
+    if (shoot_control.fric_mode == FRIC_MODE_OFF)
+    {
+        shoot_control.fric_off_time++;
+    }
+    else
+    {
+        shoot_control.fric_off_time = 0;
     }
     return shoot_control.given_current;
 }
@@ -192,11 +211,12 @@ int16_t shoot_control_loop(void)
 static void shoot_set_mode(void)
 {
     static int8_t last_s = RC_SW_UP;
+    static uint16_t last_v;
 
     //上拨判断， 一次开启，再次关闭
     if ((switch_is_up(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_up(last_s) && shoot_control.shoot_mode == SHOOT_STOP))
     {
-        shoot_control.shoot_mode = SHOOT_READY_FRIC;
+        shoot_control.shoot_mode = SHOOT_READY;
     }
     else if ((switch_is_up(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_up(last_s) && shoot_control.shoot_mode != SHOOT_STOP))
     {
@@ -204,11 +224,11 @@ static void shoot_set_mode(void)
     }
 
     //处于中档， 可以使用键盘开关摩擦轮
-    if (switch_is_mid(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && (shoot_control.shoot_rc->key.v & SHOOT_KEYBOARD))
+    if (switch_is_mid(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && (shoot_control.shoot_rc->key.v & SHOOT_KEYBOARD) && !(last_v & SHOOT_KEYBOARD))
     {
         if (shoot_control.shoot_mode == SHOOT_STOP)
         {
-            shoot_control.shoot_mode = SHOOT_READY_FRIC;
+            shoot_control.shoot_mode = SHOOT_READY;
         }
         else
         {
@@ -216,42 +236,48 @@ static void shoot_set_mode(void)
         }
     }
 
-    if(shoot_control.shoot_mode == SHOOT_READY_FRIC)
+    if(shoot_control.shoot_mode == SHOOT_READY)
     {
         //下拨一次或者鼠标按下一次，进入射击状态
-        if ((switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_down(last_s)) || (shoot_control.press_l && shoot_control.last_press_l == 0) || (shoot_control.press_r && shoot_control.last_press_r == 0))
+        if ((switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_down(last_s)) || (shoot_control.press_r && shoot_control.last_press_r == 0))
         {
+            aRGB_led_show(0xFF00FF00);
             shoot_control.shoot_mode = SHOOT_BULLET;
         }
+        else if (shoot_control.press_l && shoot_control.last_press_l == 0)
+        {
+            aRGB_led_show(0xFF0000FF);
+            shoot_control.shoot_mode = SHOOT_BULLET_ONCE;
+        }
     }
-    else if (shoot_control.shoot_mode == SHOOT_BULLET || shoot_control.shoot_mode == SHOOT_CONTINUE_BULLET)
+    else if (shoot_control.shoot_mode > SHOOT_READY)
     {
         //拨中间退出射击状态
         if (switch_is_mid(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && switch_is_down(last_s))
         {
-            shoot_control.shoot_mode = SHOOT_READY_FRIC;
+            shoot_control.shoot_mode = SHOOT_READY;
         }
     }
     
-    if(shoot_control.shoot_mode > SHOOT_READY_FRIC)
+    if (shoot_control.shoot_mode > SHOOT_READY)
     {
         //鼠标长按一直进入射击状态 保持连发
-        if ((shoot_control.press_l_time == PRESS_LONG_TIME) || (shoot_control.press_r_time == PRESS_LONG_TIME) || (shoot_control.rc_s_time == RC_S_LONG_TIME))
+        if ((shoot_control.press_r_time == PRESS_LONG_TIME) || (shoot_control.rc_s_time == RC_S_LONG_TIME))
         {
             shoot_control.shoot_mode = SHOOT_CONTINUE_BULLET;
         }
-        else if(shoot_control.shoot_mode == SHOOT_CONTINUE_BULLET)
+        else if(!shoot_control.press_l && !shoot_control.press_r)
         {
-            shoot_control.shoot_mode = SHOOT_READY_FRIC;
+            shoot_control.shoot_mode = SHOOT_READY;
         }
     }
 
     get_shoot_heat0_limit_and_heat0(&shoot_control.heat_limit, &shoot_control.heat);
     if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE > shoot_control.heat_limit))
     {
-        if(shoot_control.shoot_mode == SHOOT_BULLET || shoot_control.shoot_mode == SHOOT_CONTINUE_BULLET)
+        if(shoot_control.shoot_mode > SHOOT_READY)
         {
-            shoot_control.shoot_mode = SHOOT_READY_FRIC;
+            shoot_control.shoot_mode = SHOOT_READY;
         }
     }
     //如果云台状态是 无力状态，就关闭射击
@@ -261,6 +287,7 @@ static void shoot_set_mode(void)
     }
 
     last_s = shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL];
+    last_v = shoot_control.shoot_rc->key.v;
 }
 /**
   * @brief          射击数据更新
@@ -309,19 +336,7 @@ static void shoot_feedback_update(void)
     shoot_control.last_press_r = shoot_control.press_r;
     shoot_control.press_l = shoot_control.shoot_rc->mouse.press_l;
     shoot_control.press_r = shoot_control.shoot_rc->mouse.press_r;
-    //长按计时
-    if (shoot_control.press_l)
-    {
-        if (shoot_control.press_l_time < PRESS_LONG_TIME)
-        {
-            shoot_control.press_l_time++;
-        }
-    }
-    else
-    {
-        shoot_control.press_l_time = 0;
-    }
-
+    //右键长按计时
     if (shoot_control.press_r)
     {
         if (shoot_control.press_r_time < PRESS_LONG_TIME)
@@ -337,7 +352,6 @@ static void shoot_feedback_update(void)
     //射击开关下档时间计时
     if (shoot_control.shoot_mode != SHOOT_STOP && switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]))
     {
-
         if (shoot_control.rc_s_time < RC_S_LONG_TIME)
         {
             shoot_control.rc_s_time++;
@@ -347,6 +361,19 @@ static void shoot_feedback_update(void)
     {
         shoot_control.rc_s_time = 0;
     }
+    //单发射击计时
+    if (shoot_control.shoot_mode == SHOOT_BULLET_ONCE)
+    {
+        if (shoot_control.bullet_time < ONCE_TRIGGER_TIME)
+        {
+            shoot_control.bullet_time++;
+        }
+    }
+    else
+    {
+        shoot_control.bullet_time = 0;
+    }
+    
 }
 
 static void trigger_motor_turn_back(void)
@@ -382,28 +409,33 @@ static void trigger_motor_turn_back(void)
   */
 static void shoot_bullet_control(void)
 {
-
-    //每次拨动 1/4PI的角度
-    if (shoot_control.move_flag == 0)
+    if( shoot_control.block_time < BLOCK_TIME)
     {
-        shoot_control.set_angle = rad_format(shoot_control.angle + PI_TEN);
-        shoot_control.move_flag = 1;
-    }
-    // if(shoot_control.key == SWITCH_TRIGGER_OFF)
-    // {
-
-    //     shoot_control.shoot_mode = SHOOT_BULLET;
-    // }
-    //到达角度判断
-    if (rad_format(shoot_control.set_angle - shoot_control.angle) > 0.05f)
-    {
-        //没到达一直设置旋转速度
-        shoot_control.trigger_speed_set = TRIGGER_SPEED;
-        trigger_motor_turn_back();
+        shoot_control.speed_set = shoot_control.trigger_speed_set;
     }
     else
     {
-        shoot_control.move_flag = 0;
+        shoot_control.speed_set = -shoot_control.trigger_speed_set;
+    }
+
+    if(fabs(shoot_control.speed) < BLOCK_TRIGGER_SPEED && shoot_control.block_time < BLOCK_TIME)
+    {
+        shoot_control.block_time++;
+        shoot_control.reverse_time = 0;
+    }
+    else if (shoot_control.block_time == BLOCK_TIME && shoot_control.reverse_time < REVERSE_TIME)
+    {
+        shoot_control.bullet_time--;
+        shoot_control.reverse_time++;
+    }
+    else
+    {
+        shoot_control.block_time = 0;
+    }
+
+    if (shoot_control.bullet_time == ONCE_TRIGGER_TIME)
+    {
+        shoot_control.shoot_mode = SHOOT_READY;
     }
 }
 

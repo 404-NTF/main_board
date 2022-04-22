@@ -39,12 +39,12 @@
 #define PRESS_LONG_TIME             400
 //遥控器射击开关打下档一段时间后 连续发射子弹 用于清单
 #define RC_S_LONG_TIME              2000
-//摩擦轮高速 加速 时间
-#define UP_ADD_TIME                 80
 //摩擦轮速度
 #define FRIC_SPEED_HIGH             8000
 #define FRIC_SPEED_LOW              3000
 #define FRIC_SPEED_OFF              0
+//摩擦轮停止时间
+#define FRIC_STOP_TIME              8000
 //电机反馈码盘值范围
 #define HALF_ECD_RANGE              4096
 #define ECD_RANGE                   8191
@@ -53,9 +53,11 @@
 #define MOTOR_ECD_TO_ANGLE          0.000021305288720633905968306772076277f
 #define FULL_COUNT                  18
 //拨弹速度
-#define TRIGGER_SPEED               5.0f
-#define CONTINUE_TRIGGER_SPEED      5.0f
-#define READY_TRIGGER_SPEED         5.0f
+#define TRIGGER_SPEED               10.0f
+#define CONTINUE_TRIGGER_SPEED      15.0f
+#define ONCE_TRIGGER_SPEED          5.0f
+//单次拨弹时间
+#define ONCE_TRIGGER_TIME           100
 
 #define KEY_OFF_JUGUE_TIME          500
 #define SWITCH_TRIGGER_ON           0
@@ -87,10 +89,9 @@
 typedef enum
 {
     SHOOT_STOP = 0,
-    SHOOT_READY_FRIC,
-    SHOOT_READY_BULLET,
     SHOOT_READY,
     SHOOT_BULLET,
+    SHOOT_BULLET_ONCE,
     SHOOT_CONTINUE_BULLET,
 } shoot_mode_e;
 
@@ -99,6 +100,7 @@ typedef enum
     FRIC_MODE_HIGH = 0,
     FRIC_MODE_LOW,
     FRIC_MODE_OFF,
+    FRIC_MODE_STOP,
 } fric_mode_e;
 
 typedef struct
@@ -107,6 +109,7 @@ typedef struct
     const RC_ctrl_t *shoot_rc;
     const motor_measure_t *shoot_motor_measure;
     fric_mode_e fric_mode;
+    uint16_t fric_off_time;
     pid_type_def trigger_motor_pid;
     fp32 trigger_speed_set;
     fp32 speed;
@@ -120,10 +123,10 @@ typedef struct
     bool_t press_r;
     bool_t last_press_l;
     bool_t last_press_r;
-    uint16_t press_l_time;
     uint16_t press_r_time;
     uint16_t rc_s_time;
 
+    uint16_t bullet_time;
     uint16_t block_time;
     uint16_t reverse_time;
     bool_t move_flag;

@@ -34,7 +34,6 @@
 #include "INS_task.h"
 #include "led_flow_task.h"
 #include "oled_task.h"
-#include "referee_usart_task.h"
 #include "usb_task.h"
 #include "voltage_task.h"
 /* USER CODE END Includes */
@@ -49,7 +48,6 @@ osThreadId gimbalTaskHandle;
 osThreadId imuTaskHandle;
 osThreadId led_RGB_flow_handle;
 osThreadId oled_handle;
-osThreadId referee_usart_task_handle;
 osThreadId usb_task_handle;
 osThreadId battery_voltage_handle;
 
@@ -165,14 +163,8 @@ void MX_FREERTOS_Init(void) {
     osThreadDef(led, led_RGB_flow_task, osPriorityNormal, 0, 256);
     led_RGB_flow_handle = osThreadCreate(osThread(led), NULL);
 
-
     osThreadDef(OLED, oled_task, osPriorityLow, 0, 256);
     oled_handle = osThreadCreate(osThread(OLED), NULL);
-
-
-    osThreadDef(REFEREE, referee_usart_task, osPriorityNormal, 0, 128);
-    referee_usart_task_handle = osThreadCreate(osThread(REFEREE), NULL);
-
 
     osThreadDef(USBTask, usb_task, osPriorityNormal, 0, 128);
     usb_task_handle = osThreadCreate(osThread(USBTask), NULL);
