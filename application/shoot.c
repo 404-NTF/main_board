@@ -20,7 +20,7 @@
 
 #include "cmsis_os.h"
 
-#include "bsp_laser.h"
+#include "bsp_usart.h"
 #include "arm_math.h"
 #include "user_lib.h"
 #include "referee.h"
@@ -30,14 +30,10 @@
 #include "detect_task.h"
 #include "pid.h"
 
-#include "bsp_led.h"
-
 #define shoot_laser_on()    laser_on()      //激光开启宏定义
 #define shoot_laser_off()   laser_off()     //激光关闭宏定义
-//微动开关IO
-#define BUTTEN_TRIG_PIN HAL_GPIO_ReadPin(BUTTON_TRIG_GPIO_Port, BUTTON_TRIG_Pin)
-
-
+#define bullet_box_on()     pwm_on()        //弹仓开启宏定义
+#define bullet_box_off()    pwm_off()       //弹仓关闭宏定义
 
 
 /**
@@ -91,11 +87,11 @@ void shoot_init(void)
     //更新数据
     shoot_feedback_update();
     shoot_control.fric_mode = FRIC_MODE_STOP;
+    shoot_control.bullet_box_mode = BOX_OFF_DONE;
     shoot_control.fric_off_time = 0;
     shoot_control.ecd_count = 0;
     shoot_control.angle = shoot_control.shoot_motor_measure->ecd * MOTOR_ECD_TO_ANGLE;
     shoot_control.given_current = 0;
-    shoot_control.move_flag = 0;
     shoot_control.set_angle = shoot_control.angle;
     shoot_control.speed = 0.0f;
     shoot_control.speed_set = 0.0f;
@@ -112,7 +108,17 @@ int16_t shoot_control_loop(void)
     shoot_set_mode();        //设置状态机
     shoot_feedback_update(); //更新数据
 
-
+    if (shoot_control.bullet_box_mode == BOX_OFF)
+    {
+        bullet_box_off();
+        shoot_control.bullet_box_mode = BOX_OFF_DONE;
+    }
+    else if (shoot_control.bullet_box_mode == BOX_ON)
+    {
+        bullet_box_on();
+        shoot_control.bullet_box_mode = BOX_ON_DONE;
+    }
+    
     if (shoot_control.shoot_mode == SHOOT_STOP)
     {
         //设置拨弹轮的速度
@@ -211,7 +217,20 @@ int16_t shoot_control_loop(void)
 static void shoot_set_mode(void)
 {
     static int8_t last_s = RC_SW_UP;
-    static uint16_t last_v;
+    static uint16_t last_v = 0;
+
+    //弹仓开关判断
+    if ((shoot_control.shoot_rc->key.v & BULLET_BOX_CONTROL) && !(last_v & BULLET_BOX_CONTROL))
+    {
+        if (shoot_control.bullet_box_mode == BOX_ON_DONE)
+        {
+            shoot_control.bullet_box_mode = BOX_OFF;
+        }
+        else if (shoot_control.bullet_box_mode == BOX_OFF_DONE)
+        {
+            shoot_control.bullet_box_mode = BOX_ON;
+        }
+    }
 
     //上拨判断， 一次开启，再次关闭
     if ((switch_is_up(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_up(last_s) && shoot_control.shoot_mode == SHOOT_STOP))
@@ -241,12 +260,10 @@ static void shoot_set_mode(void)
         //下拨一次或者鼠标按下一次，进入射击状态
         if ((switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_down(last_s)) || (shoot_control.press_r && shoot_control.last_press_r == 0))
         {
-            aRGB_led_show(0xFF00FF00);
             shoot_control.shoot_mode = SHOOT_BULLET;
         }
         else if (shoot_control.press_l && shoot_control.last_press_l == 0)
         {
-            aRGB_led_show(0xFF0000FF);
             shoot_control.shoot_mode = SHOOT_BULLET_ONCE;
         }
     }

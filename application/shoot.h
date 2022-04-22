@@ -34,6 +34,8 @@
 
 //射击摩擦轮激光开关
 #define SHOOT_KEYBOARD              KEY_PRESSED_OFFSET_F
+//弹仓开关
+#define BULLET_BOX_CONTROL          KEY_PRESSED_OFFSET_R
 
 //鼠标长按判断
 #define PRESS_LONG_TIME             400
@@ -103,14 +105,22 @@ typedef enum
     FRIC_MODE_STOP,
 } fric_mode_e;
 
+typedef enum
+{
+    BOX_OFF_DONE = 0,
+    BOX_OFF,
+    BOX_ON_DONE,
+    BOX_ON,
+} bullet_box_e;
+
 typedef struct
 {
     shoot_mode_e shoot_mode;
     const RC_ctrl_t *shoot_rc;
     const motor_measure_t *shoot_motor_measure;
-    fric_mode_e fric_mode;
-    uint16_t fric_off_time;
     pid_type_def trigger_motor_pid;
+    bullet_box_e bullet_box_mode;
+    fric_mode_e fric_mode;
     fp32 trigger_speed_set;
     fp32 speed;
     fp32 speed_set;
@@ -123,13 +133,13 @@ typedef struct
     bool_t press_r;
     bool_t last_press_l;
     bool_t last_press_r;
-    uint16_t press_r_time;
     uint16_t rc_s_time;
+    uint16_t press_r_time;
 
+    uint16_t fric_off_time;
     uint16_t bullet_time;
     uint16_t block_time;
     uint16_t reverse_time;
-    bool_t move_flag;
 
     uint16_t heat_limit;
     uint16_t heat;
