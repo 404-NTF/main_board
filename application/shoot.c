@@ -167,26 +167,16 @@ int16_t shoot_control_loop(void)
             shoot_control.given_current = 0;
         }
 
-        if (shoot_control.press_r)
-        {
-            shoot_control.fric_mode = FRIC_MODE_HIGH;
-        }
-        else
-        {
-            shoot_control.fric_mode = FRIC_MODE_LOW;
-        }
+        shoot_control.fric_mode = FRIC_MODE_ON;
     }
 
     switch (shoot_control.fric_mode)
     {
-    case FRIC_MODE_LOW:
-        CAN_cmd_fric(3000, -3000);
-        break;
-    case FRIC_MODE_HIGH:
-        CAN_cmd_fric(8000, -8000);
+    case FRIC_MODE_ON:
+        CAN_cmd_fric(FRIC_SPEED_ON, -FRIC_SPEED_ON);
         break;
     case FRIC_MODE_OFF:
-        CAN_cmd_fric(-200, 200);
+        CAN_cmd_fric(-FRIC_SPEED_BACK, FRIC_SPEED_BACK);
         if (shoot_control.fric_off_time == FRIC_STOP_TIME)
         {
             shoot_control.fric_mode = FRIC_MODE_STOP;
@@ -194,7 +184,7 @@ int16_t shoot_control_loop(void)
         break;
     case FRIC_MODE_STOP:
     default:
-        CAN_cmd_fric(0, 0);
+        CAN_cmd_fric(FRIC_SPEED_OFF, FRIC_SPEED_OFF);
         break;
     }
 

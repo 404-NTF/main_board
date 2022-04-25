@@ -36,6 +36,7 @@
 #include "oled_task.h"
 #include "usb_task.h"
 #include "voltage_task.h"
+#include "usart_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,6 +51,7 @@ osThreadId led_RGB_flow_handle;
 osThreadId oled_handle;
 osThreadId usb_task_handle;
 osThreadId battery_voltage_handle;
+osThreadId usartTaskhandle;
 
 
 /* USER CODE END PTD */
@@ -172,6 +174,8 @@ void MX_FREERTOS_Init(void) {
     osThreadDef(BATTERY_VOLTAGE, battery_voltage_task, osPriorityNormal, 0, 128);
     battery_voltage_handle = osThreadCreate(osThread(BATTERY_VOLTAGE), NULL);
 
+    osThreadDef(usartTask, usart_task, osPriorityNormal, 0, 128);
+    usartTaskhandle = osThreadCreate(osThread(usartTask), NULL);
 
   /* USER CODE END RTOS_THREADS */
 

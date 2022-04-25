@@ -6,10 +6,7 @@ extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart6;
 extern DMA_HandleTypeDef hdma_usart1_tx;
 
-static uint8_t pwm_on_cmd = 0x0C;
-static uint8_t pwm_off_cmd =  0x0D;
-static uint8_t laser_on_cmd = 0x0E;
-static uint8_t laser_off_cmd =  0x0F;
+static uint8_t command_cmd[7] = {0x01, 0x02, 0x03, 0x04, 0x06, 0x08, 0x0A};
 
 void usart1_tx_dma_init(void)
 {
@@ -55,17 +52,29 @@ void usart1_tx_dma_enable(uint8_t *data, uint16_t len)
 
 void laser_on(void)
 {
-    HAL_UART_Transmit(&huart6, &laser_on_cmd, 1, 500);
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x01", 1, 500);
 }
 void laser_off(void)
 {
-    HAL_UART_Transmit(&huart6, &laser_off_cmd, 1, 500);
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x02", 1, 500);
 }
 void pwm_on(void)
 {
-    HAL_UART_Transmit(&huart6, &pwm_on_cmd, 1, 500);
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x03", 1, 500);
 }
 void pwm_off(void)
 {
-    HAL_UART_Transmit(&huart6, &pwm_off_cmd, 1, 500);
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x04", 1, 500);
+}
+
+void bmi088_ist8310_read(void) {
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x06", 1, 500);
+}
+
+void INS_cali(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count) {
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x08", 1, 500);
+}
+
+void INS_set(fp32 cali_scale[3], fp32 cali_offset[3]) {
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x0A", 1, 500);
 }

@@ -42,8 +42,8 @@
 //遥控器射击开关打下档一段时间后 连续发射子弹 用于清单
 #define RC_S_LONG_TIME              2000
 //摩擦轮速度
-#define FRIC_SPEED_HIGH             8000
-#define FRIC_SPEED_LOW              3000
+#define FRIC_SPEED_ON               8000
+#define FRIC_SPEED_BACK             200
 #define FRIC_SPEED_OFF              0
 //摩擦轮停止时间
 #define FRIC_STOP_TIME              8000
@@ -99,8 +99,7 @@ typedef enum
 
 typedef enum
 {
-    FRIC_MODE_HIGH = 0,
-    FRIC_MODE_LOW,
+    FRIC_MODE_ON = 0,
     FRIC_MODE_OFF,
     FRIC_MODE_STOP,
 } fric_mode_e;
