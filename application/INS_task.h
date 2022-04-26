@@ -25,35 +25,6 @@
 #define INS_Task_H
 #include "struct_typedef.h"
 
-
-#define SPI_DMA_GYRO_LENGHT       8
-#define SPI_DMA_ACCEL_LENGHT      9
-#define SPI_DMA_ACCEL_TEMP_LENGHT 4
-
-
-#define IMU_DR_SHFITS        0
-#define IMU_SPI_SHFITS       1
-#define IMU_UPDATE_SHFITS    2
-#define IMU_NOTIFY_SHFITS    3
-
-
-#define BMI088_GYRO_RX_BUF_DATA_OFFSET  1
-#define BMI088_ACCEL_RX_BUF_DATA_OFFSET 2
-
-//ist83100原始数据在缓冲区buf的位置
-#define IST8310_RX_BUF_DATA_OFFSET 16
-
-
-#define TEMPERATURE_PID_KP 1600.0f //温度控制PID的kp
-#define TEMPERATURE_PID_KI 0.2f    //温度控制PID的ki
-#define TEMPERATURE_PID_KD 0.0f    //温度控制PID的kd
-
-#define TEMPERATURE_PID_MAX_OUT   4500.0f //温度控制PID的max_out
-#define TEMPERATURE_PID_MAX_IOUT 4400.0f  //温度控制PID的max_iout
-
-#define MPU6500_TEMP_PWM_MAX 5000 //mpu6500控制温度的设置TIM的重载值，即给PWM最大为 MPU6500_TEMP_PWM_MAX - 1
-
-
 #define INS_TASK_INIT_TIME 7 //任务开始初期 delay 一段时间
 
 #define INS_YAW_ADDRESS_OFFSET    0
@@ -64,19 +35,6 @@
 #define INS_GYRO_Y_ADDRESS_OFFSET 1
 #define INS_GYRO_Z_ADDRESS_OFFSET 2
 
-#define INS_ACCEL_X_ADDRESS_OFFSET 0
-#define INS_ACCEL_Y_ADDRESS_OFFSET 1
-#define INS_ACCEL_Z_ADDRESS_OFFSET 2
-
-#define INS_MAG_X_ADDRESS_OFFSET 0
-#define INS_MAG_Y_ADDRESS_OFFSET 1
-#define INS_MAG_Z_ADDRESS_OFFSET 2
-
-/**
-  * @brief          imu task, init bmi088, ist8310, calculate the euler angle
-  * @param[in]      pvParameters: NULL
-  * @retval         none
-  */
 /**
   * @brief          imu任务, 初始化 bmi088, ist8310, 计算欧拉角
   * @param[in]      pvParameters: NULL
@@ -84,13 +42,14 @@
   */
 extern void INS_task(void const *pvParameters);
 
-/**
-  * @brief          calculate gyro zero drift
-  * @param[out]     cali_scale:scale, default 1.0
-  * @param[out]     cali_offset:zero drift, collect the gyro ouput when in still
-  * @param[out]     time_count: time, when call gyro_offset_calc 
-  * @retval         none
-  */
+extern void set_init(void);
+
+extern void set_ins_ok(void);
+
+extern void cali_gyro_comp(void);
+
+extern void set_value(fp32 gyro[3], fp32 accel[3], fp32 mag[3], fp32 quat[4], fp32 angle[3]);
+
 /**
   * @brief          校准陀螺仪
   * @param[out]     陀螺仪的比例因子，1.0f为默认值，不修改
@@ -101,12 +60,6 @@ extern void INS_task(void const *pvParameters);
 extern void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count);
 
 /**
-  * @brief          get gyro zero drift from flash
-  * @param[in]      cali_scale:scale, default 1.0
-  * @param[in]      cali_offset:zero drift, 
-  * @retval         none
-  */
-/**
   * @brief          校准陀螺仪设置，将从flash或者其他地方传入校准值
   * @param[in]      陀螺仪的比例因子，1.0f为默认值，不修改
   * @param[in]      陀螺仪的零漂
@@ -114,11 +67,6 @@ extern void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *tim
   */
 extern void INS_set_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3]);
 
-/**
-  * @brief          get the quat
-  * @param[in]      none
-  * @retval         the point of INS_quat
-  */
 /**
   * @brief          获取四元数
   * @param[in]      none
@@ -128,11 +76,6 @@ extern const fp32 *get_INS_quat_point(void);
 
 
 /**
-  * @brief          get the euler angle, 0:yaw, 1:pitch, 2:roll unit rad
-  * @param[in]      none
-  * @retval         the point of INS_angle
-  */
-/**
   * @brief          获取欧拉角, 0:yaw, 1:pitch, 2:roll 单位 rad
   * @param[in]      none
   * @retval         INS_angle的指针
@@ -140,11 +83,6 @@ extern const fp32 *get_INS_quat_point(void);
 extern const fp32 *get_INS_angle_point(void);
 
 
-/**
-  * @brief          get the rotation speed, 0:x-axis, 1:y-axis, 2:roll-axis,unit rad/s
-  * @param[in]      none
-  * @retval         the point of INS_gyro
-  */
 /**
   * @brief          获取角速度,0:x轴, 1:y轴, 2:roll轴 单位 rad/s
   * @param[in]      none
@@ -154,22 +92,12 @@ extern const fp32 *get_gyro_data_point(void);
 
 
 /**
-  * @brief          get aceel, 0:x-axis, 1:y-axis, 2:roll-axis unit m/s2
-  * @param[in]      none
-  * @retval         the point of INS_gyro
-  */
-/**
   * @brief          获取加速度,0:x轴, 1:y轴, 2:roll轴 单位 m/s2
   * @param[in]      none
   * @retval         INS_gyro的指针
   */
 extern const fp32 *get_accel_data_point(void);
 
-/**
-  * @brief          get mag, 0:x-axis, 1:y-axis, 2:roll-axis unit ut
-  * @param[in]      none
-  * @retval         the point of INS_mag
-  */
 /**
   * @brief          获取加速度,0:x轴, 1:y轴, 2:roll轴 单位 ut
   * @param[in]      none

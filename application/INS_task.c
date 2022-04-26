@@ -28,14 +28,6 @@
 #include "cmsis_os.h"
 
 #include "bsp_usart.h"
-#include "pid.h"
-
-#include "calibrate_task.h"
-#include "detect_task.h"
-
-
-fp32 gyro_offset[3];
-fp32 gyro_cali_offset[3];
 
 static fp32 INS_gyro[3] = {0.0f, 0.0f, 0.0f};
 static fp32 INS_accel[3] = {0.0f, 0.0f, 0.0f};
@@ -44,6 +36,8 @@ static fp32 INS_quat[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 fp32 INS_angle[3] = {0.0f, 0.0f, 0.0f};      //euler angle, unit rad.欧拉角 单位 rad
 
 bool_t bmi088_ist8310_inited = 0;
+bool_t ins_set_ok;
+bool_t cali_gyro_ok;
 bool_t command_callback;
 
 
@@ -55,42 +49,52 @@ bool_t command_callback;
 
 void INS_task(void const *pvParameters)
 {
-    command_callback = 0;
     //wait a time
     osDelay(INS_TASK_INIT_TIME);
-    while (!bmi088_ist8310_inited)
+    while (bmi088_ist8310_inited == 0)
     {
         osDelay(100);
     }
     while (1)
     {
+        command_callback = 0;
         bmi088_ist8310_read();
-        while (!command_callback)
+        while (command_callback == 0)
         {
         }
-        command_callback = 0;
-
     }
 }
 
-/**
-  * @brief          计算陀螺仪零漂
-  * @param[out]     gyro_offset:计算零漂
-  * @param[in]      gyro:角速度数据
-  * @param[out]     offset_time_count: 自动加1
-  * @retval         none
-  */
-void gyro_offset_calc(fp32 gyro_offset[3], fp32 gyro[3], uint16_t *offset_time_count)
-{
-    if (gyro_offset == NULL || gyro == NULL || offset_time_count == NULL)
-    {
-        return;
-    }
+void set_init(void) {
+    bmi088_ist8310_inited = 1;
+}
 
-        gyro_offset[0] = gyro_offset[0] - 0.0003f * gyro[0];
-        gyro_offset[1] = gyro_offset[1] - 0.0003f * gyro[1];
-        gyro_offset[2] = gyro_offset[2] - 0.0003f * gyro[2];
-        (*offset_time_count)++;
+void set_ins_ok(void) {
+    ins_set_ok = 1;
+}
+
+void cali_gyro_comp(void) {
+    cali_gyro_ok = 1;
+}
+
+void set_value(fp32 gyro[3], fp32 accel[3], fp32 mag[3], fp32 quat[4], fp32 angle[3]) {
+    INS_gyro[0] = gyro[0];
+    INS_gyro[1] = gyro[1];
+    INS_gyro[2] = gyro[2];
+    INS_accel[0] = accel[0];
+    INS_accel[1] = accel[1];
+    INS_accel[2] = accel[2];
+    INS_mag[0] = mag[0];
+    INS_mag[1] = mag[1];
+    INS_mag[2] = mag[2];
+    INS_quat[0] = quat[0];
+    INS_quat[1] = quat[1];
+    INS_quat[2] = quat[2];
+    INS_quat[3] = quat[3];
+    INS_angle[0] = angle[0];
+    INS_angle[1] = angle[1];
+    INS_angle[2] = angle[2];
+    command_callback = 1;
 }
 
 /**
@@ -100,24 +104,14 @@ void gyro_offset_calc(fp32 gyro_offset[3], fp32 gyro[3], uint16_t *offset_time_c
   * @param[out]     陀螺仪的时刻，每次在gyro_offset调用会加1,
   * @retval         none
   */
- //TODO 2字节uint16_t time_count,返回12字节fp32 gyro_offset[3]
 void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count)
 {
-        if( *time_count == 0)
-        {
-            gyro_offset[0] = gyro_cali_offset[0];
-            gyro_offset[1] = gyro_cali_offset[1];
-            gyro_offset[2] = gyro_cali_offset[2];
-        }
-        gyro_offset_calc(gyro_offset, INS_gyro, time_count);
-
-        cali_offset[0] = gyro_offset[0];
-        cali_offset[1] = gyro_offset[1];
-        cali_offset[2] = gyro_offset[2];
-        cali_scale[0] = 1.0f;
-        cali_scale[1] = 1.0f;
-        cali_scale[2] = 1.0f;
-
+    cali_gyro_ok = 0;
+    INS_cali(cali_scale, cali_offset, time_count);
+    while (cali_gyro_ok == 0)
+    {
+        osDelay(100);
+    }
 }
 
 /**
@@ -126,15 +120,14 @@ void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count
   * @param[in]      陀螺仪的零漂
   * @retval         none
   */
- //TODO 12b fp32 cali_offset[3] 1b ok
 void INS_set_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3])
 {
-    gyro_cali_offset[0] = cali_offset[0];
-    gyro_cali_offset[1] = cali_offset[1];
-    gyro_cali_offset[2] = cali_offset[2];
-    gyro_offset[0] = gyro_cali_offset[0];
-    gyro_offset[1] = gyro_cali_offset[1];
-    gyro_offset[2] = gyro_cali_offset[2];
+    ins_set_ok = 0;
+    INS_set(cali_scale, cali_offset);
+    while (ins_set_ok == 0)
+    {
+        osDelay(100);
+    }
 }
 
 /**

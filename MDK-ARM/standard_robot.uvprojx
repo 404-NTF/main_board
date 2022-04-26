@@ -651,6 +651,21 @@
               <FileType>1</FileType>
               <FilePath>..\application\usart_task.c</FilePath>
             </File>
+            <File>
+              <FileName>coder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\application\coder.c</FilePath>
+            </File>
+            <File>
+              <FileName>decoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\application\decoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\application\encoder.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
