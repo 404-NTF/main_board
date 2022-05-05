@@ -49,7 +49,6 @@
 #include "oled_task.h"
 #include "usb_task.h"
 #include "voltage_task.h"
-#include "bsp_led.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

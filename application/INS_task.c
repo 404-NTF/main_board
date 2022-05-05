@@ -29,8 +29,6 @@
 
 #include "bsp_usart.h"
 
-#include "bsp_led.h"
-
 static fp32 INS_gyro[3] = {0.0f, 0.0f, 0.0f};
 static fp32 INS_accel[3] = {0.0f, 0.0f, 0.0f};
 static fp32 INS_mag[3] = {0.0f, 0.0f, 0.0f};
@@ -64,7 +62,6 @@ void INS_task(void const *pvParameters)
             bmi088_ist8310_init();
         }
     }
-    bool_t t = 1;
     while (1)
     {
         command_callback = 0;
@@ -82,22 +79,7 @@ void INS_task(void const *pvParameters)
                 bmi088_ist8310_read();
             }
         }
-        if (t)
-        {
-        aRGB_led_show(0xFF0000FF);
-
-          t = 0;
-        }
-        else
-        {
-                  aRGB_led_show(0xFF00FF00);
-
-          t = 1;
-
-        }
-        
-
-        osDelay(300);
+        osDelay(100);
 
     }
 }

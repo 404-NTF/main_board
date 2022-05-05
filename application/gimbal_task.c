@@ -41,6 +41,7 @@
 #include "shoot.h"
 #include "pid.h"
 
+#include "bsp_led.h"
 
 //motor enconde value format, range[0-8191]
 //电机编码值规整 0—8191

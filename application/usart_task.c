@@ -9,8 +9,6 @@
 
 #include "decoder.h"
 
-#include "bsp_led.h"
-
 extern UART_HandleTypeDef huart6;
 extern DMA_HandleTypeDef hdma_usart6_rx;
 
@@ -39,42 +37,37 @@ void USART6_IRQHandler(void) {
 
         __HAL_UART_CLEAR_PEFLAG(&huart6);
 
+        //失效DMA
+        __HAL_DMA_DISABLE(&hdma_usart6_rx);
+
+        //获取接收数据长度,长度 = 设定长度 - 剩余长度
         this_time_rx_len = TOTAL_LENGTH - hdma_usart6_rx.Instance->NDTR;
 
-        if (this_time_rx_len == NORMAL_LENGTH || this_time_rx_len == BMI088_IST8310_LENGTH)
+        //重新设定数据长度
+        hdma_usart6_rx.Instance->NDTR = TOTAL_LENGTH;
+
+        if ((hdma_usart6_rx.Instance->CR & DMA_SxCR_CT) == RESET)
         {
-            //失效DMA
-            __HAL_DMA_DISABLE(&hdma_usart6_rx);
+            //设定缓冲区1
+            hdma_usart6_rx.Instance->CR |= DMA_SxCR_CT;
+            
+            //使能DMA
+            __HAL_DMA_ENABLE(&hdma_usart6_rx);
 
-            //重新设定数据长度
-            hdma_usart6_rx.Instance->NDTR = TOTAL_LENGTH;
-
-            if ((hdma_usart6_rx.Instance->CR & DMA_SxCR_CT) == RESET)
-            {
-                //设定缓冲区1
-                hdma_usart6_rx.Instance->CR |= DMA_SxCR_CT;
-
-                //使能DMA
-                __HAL_DMA_ENABLE(&hdma_usart6_rx);
-
-                decode_rx_data(rx_buf[0], this_time_rx_len);
-                //记录数据接收时间
-            }
-            else
-            {
-                //设定缓冲区0
-                DMA2_Stream1->CR &= ~(DMA_SxCR_CT);
-
-                //使能DMA
-                __HAL_DMA_ENABLE(&hdma_usart6_rx);
-
-                //处理遥控器数据
-                decode_rx_data(rx_buf[1], this_time_rx_len);
-            }
-
+            decode_rx_data(rx_buf[0], this_time_rx_len);
+            //记录数据接收时间
         }
-        
+        else
+        {
+            //设定缓冲区0
+            DMA2_Stream1->CR &= ~(DMA_SxCR_CT);
+            
+            //使能DMA
+            __HAL_DMA_ENABLE(&hdma_usart6_rx);
 
+            //处理遥控器数据
+            decode_rx_data(rx_buf[1], this_time_rx_len);
+        }
     }
 }
 
@@ -107,21 +100,22 @@ static void usart_init(uint8_t *rx1_buf, uint8_t *rx2_buf, uint16_t dma_buf_num)
 
 }
 
-static void decode_rx_data(uint8_t *rx_bufs, uint16_t length) {
+static void decode_rx_data(uint8_t rx_bufs[TOTAL_LENGTH], uint16_t length) {
     
-    if (length == NORMAL_LENGTH && *rx_bufs == 0x06)
+    if (length == NORMAL_LENGTH && rx_bufs[0] == 0x06)
     {
         set_init();
         //记录数据接收时间
         detect_hook(RM_IMU_TOE);
     }
-    else if (length == BMI088_IST8310_LENGTH && *rx_bufs == 0x08)
+    else if (length == BMI088_IST8310_LENGTH && rx_bufs[0] == 0x08)
     {
         fp32 INS_gyro[3], INS_accel[3], INS_mag[3], INS_quat[4], INS_angle[3];
         uint8_t temp;
         data_t data;
         data.value = rx_bufs;
         data.length = BMI088_IST8310_LENGTH;
+        data.curser = 0;
         get_uint8_t(&data, &temp, 1);
         get_fp32(&data, INS_gyro, 3);
         get_fp32(&data, INS_accel, 3);
