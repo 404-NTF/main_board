@@ -88,6 +88,7 @@ void shoot_init(void)
     shoot_feedback_update();
     shoot_control.fric_mode = FRIC_MODE_STOP;
     shoot_control.bullet_box_mode = BOX_OFF_DONE;
+    shoot_control.laser_mode = LASER_MODE_OFF;
     shoot_control.fric_off_time = 0;
     shoot_control.ecd_count = 0;
     shoot_control.angle = shoot_control.shoot_motor_measure->ecd * MOTOR_ECD_TO_ANGLE;
@@ -149,7 +150,11 @@ int16_t shoot_control_loop(void)
 
     if(shoot_control.shoot_mode == SHOOT_STOP)
     {
-        shoot_laser_off();
+        if (shoot_control.laser_mode == LASER_MODE_ON)
+        {
+            shoot_laser_off(); //激光关闭
+            shoot_control.laser_mode = LASER_MODE_OFF;
+        }
         shoot_control.given_current = 0;
         if (shoot_control.fric_mode < FRIC_MODE_OFF)
         {
@@ -158,7 +163,11 @@ int16_t shoot_control_loop(void)
     }
     else
     {
-        shoot_laser_on(); //激光开启
+        if (shoot_control.laser_mode == LASER_MODE_OFF)
+        {
+            shoot_laser_on(); //激光开启
+            shoot_control.laser_mode = LASER_MODE_ON;
+        }
         //计算拨弹轮电机PID
         PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
         shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);

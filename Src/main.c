@@ -49,6 +49,7 @@
 #include "oled_task.h"
 #include "usb_task.h"
 #include "voltage_task.h"
+#include "bsp_led.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -139,7 +140,6 @@ int main(void)
     remote_control_init();
     usart1_tx_dma_init();
   /* USER CODE END 2 */
-
   /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init();
   /* Start scheduler */

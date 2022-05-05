@@ -29,6 +29,8 @@
 
 #include "bsp_usart.h"
 
+#include "bsp_led.h"
+
 static fp32 INS_gyro[3] = {0.0f, 0.0f, 0.0f};
 static fp32 INS_accel[3] = {0.0f, 0.0f, 0.0f};
 static fp32 INS_mag[3] = {0.0f, 0.0f, 0.0f};
@@ -36,9 +38,9 @@ static fp32 INS_quat[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 fp32 INS_angle[3] = {0.0f, 0.0f, 0.0f};      //euler angle, unit rad.Å·À­½Ç µ¥Î» rad
 
 bool_t bmi088_ist8310_inited = 0;
-bool_t ins_set_ok;
-bool_t cali_gyro_ok;
 bool_t command_callback;
+
+uint8_t timeout;
 
 
 /**
@@ -49,32 +51,59 @@ bool_t command_callback;
 
 void INS_task(void const *pvParameters)
 {
-    //wait a time
-    osDelay(INS_TASK_INIT_TIME);
+    timeout = 0;
+
+    bmi088_ist8310_init();
     while (bmi088_ist8310_inited == 0)
     {
+        timeout++;
         osDelay(100);
+        if (timeout > 1)
+        {
+            timeout = 0;
+            bmi088_ist8310_init();
+        }
     }
+    bool_t t = 1;
     while (1)
     {
         command_callback = 0;
+
+        timeout = 0;
         bmi088_ist8310_read();
+
         while (command_callback == 0)
         {
+            timeout++;
+            osDelay(100);
+            if (timeout > 1)
+            {
+                timeout = 0;
+                bmi088_ist8310_read();
+            }
         }
+        if (t)
+        {
+        aRGB_led_show(0xFF0000FF);
+
+          t = 0;
+        }
+        else
+        {
+                  aRGB_led_show(0xFF00FF00);
+
+          t = 1;
+
+        }
+        
+
+        osDelay(300);
+
     }
 }
 
 void set_init(void) {
     bmi088_ist8310_inited = 1;
-}
-
-void set_ins_ok(void) {
-    ins_set_ok = 1;
-}
-
-void cali_gyro_comp(void) {
-    cali_gyro_ok = 1;
 }
 
 void set_value(fp32 gyro[3], fp32 accel[3], fp32 mag[3], fp32 quat[4], fp32 angle[3]) {
@@ -106,12 +135,7 @@ void set_value(fp32 gyro[3], fp32 accel[3], fp32 mag[3], fp32 quat[4], fp32 angl
   */
 void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count)
 {
-    cali_gyro_ok = 0;
     INS_cali(cali_scale, cali_offset, time_count);
-    while (cali_gyro_ok == 0)
-    {
-        osDelay(100);
-    }
 }
 
 /**
@@ -122,12 +146,7 @@ void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count
   */
 void INS_set_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3])
 {
-    ins_set_ok = 0;
     INS_set(cali_scale, cali_offset);
-    while (ins_set_ok == 0)
-    {
-        osDelay(100);
-    }
 }
 
 /**

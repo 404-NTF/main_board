@@ -112,6 +112,12 @@ typedef enum
     BOX_ON,
 } bullet_box_e;
 
+typedef enum
+{
+    LASER_MODE_ON = 0,
+    LASER_MODE_OFF,
+} laser_mode_e;
+
 typedef struct
 {
     shoot_mode_e shoot_mode;
@@ -120,6 +126,7 @@ typedef struct
     pid_type_def trigger_motor_pid;
     bullet_box_e bullet_box_mode;
     fric_mode_e fric_mode;
+    laser_mode_e laser_mode;
     fp32 trigger_speed_set;
     fp32 speed;
     fp32 speed_set;

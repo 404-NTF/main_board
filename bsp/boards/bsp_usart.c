@@ -1,6 +1,6 @@
 #include "bsp_usart.h"
 #include "main.h"
-#include "bsp_led.h"
+#include "bsp_adc.h"
 #include "calibrate_task.h"
 
 #include "encoder.h"
@@ -53,30 +53,36 @@ void usart1_tx_dma_enable(uint8_t *data, uint16_t len)
 
 void laser_on(void)
 {
-    HAL_UART_Transmit(&huart6, (uint8_t*)"\x01", 1, 500);
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x01", 1, 100);
 }
 
 void laser_off(void)
 {
-    HAL_UART_Transmit(&huart6, (uint8_t*)"\x02", 1, 500);
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x02", 1, 100);
 }
 
 void pwm_on(void)
 {
-    HAL_UART_Transmit(&huart6, (uint8_t*)"\x03", 1, 500);
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x03", 1, 100);
 }
 
 void pwm_off(void)
 {
-    HAL_UART_Transmit(&huart6, (uint8_t*)"\x04", 1, 500);
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x04", 1, 100);
+}
+
+void bmi088_ist8310_init(void) {
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x05", 1, 100);
+    int8_t temperature = (int8_t)get_temprate() + 10;
+    HAL_UART_Transmit(&huart6, (uint8_t*)&temperature, 1, 100);
 }
 
 void bmi088_ist8310_read(void) {
-    HAL_UART_Transmit(&huart6, (uint8_t*)"\x06", 1, 500);
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x07", 1, 100);
 }
 
 void INS_cali(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count) {
-    HAL_UART_Transmit(&huart6, (uint8_t*)"\x08", 1, 500);
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x09", 1, 100);
     uint8_t datas[CALI_GYRO_LENGTH];
     data_t data;
     data.value = datas;
@@ -84,23 +90,16 @@ void INS_cali(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count) {
     set_fp32(&data, cali_scale, 3);
     set_fp32(&data, cali_offset, 3);
     set_uint16_t(&data, time_count, 1);
-    HAL_UART_Transmit(&huart6, datas, CALI_GYRO_LENGTH, 500);
+    HAL_UART_Transmit(&huart6, datas, CALI_GYRO_LENGTH, 100);
 }
 
 void INS_set(fp32 cali_scale[3], fp32 cali_offset[3]) {
-    HAL_UART_Transmit(&huart6, (uint8_t*)"\x0A", 1, 500);
+    HAL_UART_Transmit(&huart6, (uint8_t*)"\x0A", 1, 100);
     uint8_t datas[SET_GYRO_LENGTH];
     data_t data;
     data.value = datas;
     data.length = SET_GYRO_LENGTH;
     set_fp32(&data, cali_scale, 3);
     set_fp32(&data, cali_offset, 3);
-    HAL_UART_Transmit(&huart6, datas, SET_GYRO_LENGTH, 500);
-}
-
-void send_control_temperature(void) {
-    uint8_t data = 0x0D;
-    HAL_UART_Transmit(&huart6, &data, 1, 500);
-    data = (uint8_t)get_control_temperature();
-    HAL_UART_Transmit(&huart6, &data, 1, 500);
+    HAL_UART_Transmit(&huart6, datas, SET_GYRO_LENGTH, 100);
 }

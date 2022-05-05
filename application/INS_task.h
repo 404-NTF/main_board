@@ -44,10 +44,6 @@ extern void INS_task(void const *pvParameters);
 
 extern void set_init(void);
 
-extern void set_ins_ok(void);
-
-extern void cali_gyro_comp(void);
-
 extern void set_value(fp32 gyro[3], fp32 accel[3], fp32 mag[3], fp32 quat[4], fp32 angle[3]);
 
 /**
