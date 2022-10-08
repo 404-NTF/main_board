@@ -217,9 +217,10 @@ static void shoot_set_mode(void)
 {
     static int8_t last_s = RC_SW_UP;
     static uint16_t last_v = 0;
+    bool_t chassis_stop = gimbal_cmd_to_shoot_stop();
 
     //弹仓开关判断
-    if ((shoot_control.shoot_rc->key.v & BULLET_BOX_CONTROL) && !(last_v & BULLET_BOX_CONTROL))
+    if (!chassis_stop && shoot_control.shoot_mode == SHOOT_STOP && ((switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_down(last_s)) || ((shoot_control.shoot_rc->key.v & BULLET_BOX_CONTROL) && !(last_v & BULLET_BOX_CONTROL))))
     {
         if (shoot_control.bullet_box_mode == BOX_ON_DONE)
         {
@@ -282,7 +283,7 @@ static void shoot_set_mode(void)
         {
             shoot_control.shoot_mode = SHOOT_CONTINUE_BULLET;
         }
-        else if(!shoot_control.press_l && !shoot_control.press_r)
+        else if(!switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !shoot_control.press_l && !shoot_control.press_r)
         {
             shoot_control.shoot_mode = SHOOT_READY;
         }
@@ -297,7 +298,7 @@ static void shoot_set_mode(void)
         }
     }
     //如果云台状态是 无力状态，就关闭射击
-    if (gimbal_cmd_to_shoot_stop())
+    if (chassis_stop)
     {
         shoot_control.shoot_mode = SHOOT_STOP;
     }
