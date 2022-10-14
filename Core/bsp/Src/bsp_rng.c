@@ -1,4 +1,4 @@
-#include "../Inc/bsp_rng.h"
+#include "bsp_rng.h"
 #include "main.h"
 
 extern RNG_HandleTypeDef hrng;

@@ -1,8 +1,8 @@
 /**
   ****************************(C) COPYRIGHT 2019 DJI****************************
   * @file       led_trigger_task.c/h
-  * @brief      led RGB show.led RGB��Ч��
-  * @note       
+  * @brief      led RGB show.led RGB灯效。
+  * @note
   * @history
   *  Version    Date            Author          Modification
   *  V1.0.0     Nov-11-2019     RM              1. rgb led
@@ -23,7 +23,7 @@
 #define RGB_FLOW_COLOR_CHANGE_TIME  1000
 #define RGB_FLOW_COLOR_LENGHT   6
 //blue-> green(dark)-> red -> blue(dark) -> green(dark) -> red(dark) -> blue
-//�� -> ��(��) -> �� -> ��(��) -> �� -> ��(��) -> �� 
+//蓝 -> 绿(灭) -> 红 -> 蓝(灭) -> 绿 -> 红(灭) -> 蓝
 uint32_t RGB_flow_color[RGB_FLOW_COLOR_LENGHT + 1] = {0xFF0000FF, 0x0000FF00, 0xFFFF0000, 0x000000FF, 0xFF00FF00, 0x00FF0000, 0xFF0000FF};
 
 /**
@@ -32,7 +32,7 @@ uint32_t RGB_flow_color[RGB_FLOW_COLOR_LENGHT + 1] = {0xFF0000FF, 0x0000FF00, 0x
   * @retval         none
   */
 /**
-  * @brief          led RGB����
+  * @brief          led RGB任务
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
@@ -71,7 +71,7 @@ void led_RGB_flow_task(void const * argument)
 
         //         aRGB = ((uint32_t)(alpha)) << 24 | ((uint32_t)(red)) << 16 | ((uint32_t)(green)) << 8 | ((uint32_t)(blue)) << 0;
         //         aRGB_led_show(aRGB);
-                osDelay(1);
+        osDelay(1);
         //     }
         // }
     }

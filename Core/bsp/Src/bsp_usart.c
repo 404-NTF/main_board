@@ -1,6 +1,6 @@
-#include "../Inc/bsp_usart.h"
+#include "bsp_usart.h"
 #include "main.h"
-#include "../Inc/bsp_adc.h"
+#include "bsp_adc.h"
 #include "calibrate_task.h"
 
 #include "encoder.h"
@@ -13,12 +13,12 @@ void usart1_tx_dma_init(void)
 {
 
     //enable the DMA transfer for the receiver and tramsmit request
-    //ʹ��DMA���ڽ��պͷ���
+    //使能DMA串口接收和发送
     SET_BIT(huart1.Instance->CR3, USART_CR3_DMAR);
     SET_BIT(huart1.Instance->CR3, USART_CR3_DMAT);
 
     //disable DMA
-    //ʧЧDMA
+    //失效DMA
     __HAL_DMA_DISABLE(&hdma_usart1_tx);
 
     while(hdma_usart1_tx.Instance->CR & DMA_SxCR_EN)
@@ -35,7 +35,7 @@ void usart1_tx_dma_init(void)
 void usart1_tx_dma_enable(uint8_t *data, uint16_t len)
 {
     //disable DMA
-    //ʧЧDMA
+    //失效DMA
     __HAL_DMA_DISABLE(&hdma_usart1_tx);
 
     while(hdma_usart1_tx.Instance->CR & DMA_SxCR_EN)

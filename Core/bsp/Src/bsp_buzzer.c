@@ -1,4 +1,4 @@
-#include "../Inc/bsp_buzzer.h"
+#include "bsp_buzzer.h"
 #include "main.h"
 extern TIM_HandleTypeDef htim4;
 void buzzer_on(uint16_t psc, uint16_t pwm)

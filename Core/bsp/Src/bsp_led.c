@@ -1,4 +1,4 @@
-#include "../Inc/bsp_led.h"
+#include "bsp_led.h"
 #include "main.h"
 
 extern TIM_HandleTypeDef htim5;
@@ -8,8 +8,8 @@ extern TIM_HandleTypeDef htim5;
   * @retval         none
   */
 /**
-  * @brief          ��ʾRGB
-  * @param[in]      aRGB:0xaaRRGGBB,'aa' ��͸����,'RR'�Ǻ�ɫ,'GG'����ɫ,'BB'����ɫ
+  * @brief          显示RGB
+  * @param[in]      aRGB:0xaaRRGGBB,'aa' 是透明度,'RR'是红色,'GG'是绿色,'BB'是蓝色
   * @retval         none
   */
 void aRGB_led_show(uint32_t aRGB)
@@ -22,9 +22,9 @@ void aRGB_led_show(uint32_t aRGB)
     green = ((aRGB & 0x0000FF00) >> 8) * alpha;
     blue = ((aRGB & 0x000000FF) >> 0) * alpha;
 
-    __HAL_TIM_SetCompare(&htim5, TIM_CHANNEL_1, blue);
-    __HAL_TIM_SetCompare(&htim5, TIM_CHANNEL_2, green);
-    __HAL_TIM_SetCompare(&htim5, TIM_CHANNEL_3, red);
+        __HAL_TIM_SetCompare(&htim5, TIM_CHANNEL_1, blue);
+        __HAL_TIM_SetCompare(&htim5, TIM_CHANNEL_2, green);
+        __HAL_TIM_SetCompare(&htim5, TIM_CHANNEL_3, red);
 }
 
 

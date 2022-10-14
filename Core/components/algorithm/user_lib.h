@@ -4,36 +4,36 @@
 
 typedef __packed struct
 {
-    fp32 input;        //ÊäÈëÊı¾İ
-    fp32 out;          //ÂË²¨Êä³öµÄÊı¾İ
-    fp32 num[1];       //ÂË²¨²ÎÊı
-    fp32 frame_period; //ÂË²¨µÄÊ±¼ä¼ä¸ô µ¥Î» s
+    fp32 input;        //è¾“å…¥æ•°æ®
+    fp32 out;          //æ»¤æ³¢è¾“å‡ºçš„æ•°æ®
+    fp32 num[1];       //æ»¤æ³¢å‚æ•°
+    fp32 frame_period; //æ»¤æ³¢çš„æ—¶é—´é—´éš” å•ä½ s
 } first_order_filter_type_t;
-//¿ìËÙ¿ª·½
+//å¿«é€Ÿå¼€æ–¹
 extern fp32 invSqrt(fp32 num);
 
-//Ò»½×ÂË²¨³õÊ¼»¯
+//ä¸€é˜¶æ»¤æ³¢åˆå§‹åŒ–
 extern void first_order_filter_init(first_order_filter_type_t *first_order_filter_type, fp32 frame_period, const fp32 num[1]);
-//Ò»½×ÂË²¨¼ÆËã
+//ä¸€é˜¶æ»¤æ³¢è®¡ç®—
 extern void first_order_filter_cali(first_order_filter_type_t *first_order_filter_type, fp32 input);
-//¾ø¶ÔÏŞÖÆ
+//ç»å¯¹é™åˆ¶
 extern void abs_limit(fp32 *num, fp32 Limit);
-//ÅĞ¶Ï·ûºÅÎ»
+//åˆ¤æ–­ç¬¦å·ä½
 extern fp32 sign(fp32 value);
-//¸¡µãËÀÇø
+//æµ®ç‚¹æ­»åŒº
 extern fp32 fp32_deadline(fp32 Value, fp32 minValue, fp32 maxValue);
-//int26ËÀÇø
+//int26æ­»åŒº
 extern int16_t int16_deadline(int16_t Value, int16_t minValue, int16_t maxValue);
-//ÏŞ·ùº¯Êı
+//é™å¹…å‡½æ•°
 extern fp32 fp32_constrain(fp32 Value, fp32 minValue, fp32 maxValue);
-//ÏŞ·ùº¯Êı
+//é™å¹…å‡½æ•°
 extern int16_t int16_constrain(int16_t Value, int16_t minValue, int16_t maxValue);
-//Ñ­»·ÏŞ·ùº¯Êı
+//å¾ªç¯é™å¹…å‡½æ•°
 extern fp32 loop_fp32_constrain(fp32 Input, fp32 minValue, fp32 maxValue);
-//½Ç¶È ¡ãÏŞ·ù 180 ~ -180
+//è§’åº¦ Â°é™å¹… 180 ~ -180
 extern fp32 theta_format(fp32 Ang);
 
-//»¡¶È¸ñÊ½»¯Îª-PI~PI
+//å¼§åº¦æ ¼å¼åŒ–ä¸º-PI~PI
 #define rad_format(Ang) loop_fp32_constrain((Ang), -PI, PI)
 
 #endif

@@ -1,4 +1,4 @@
-#include "../Inc/bsp_crc32.h"
+#include "bsp_crc32.h"
 #include "main.h"
 extern CRC_HandleTypeDef hcrc;
 
