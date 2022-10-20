@@ -51,7 +51,7 @@ endif ()
 include_directories(${includes})
 include_directories(Core/app/Inc Core/app/protocol Core/bsp/Inc Core/components/algorithm Core/components/algorithm/Include Core/components/controller Core/components/devices Core/components/support)
 
-add_definitions(${defines})
+add_definitions(${defines} -DARM_MATH_CM4 -D__FPU_USED=1U -D__FPU_PRESENT=1U -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING)
 
 file(GLOB_RECURSE SOURCES ${sources})
 

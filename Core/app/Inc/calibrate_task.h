@@ -99,17 +99,18 @@
 #ifndef CALIBRATE_TASK_H
 #define CALIBRATE_TASK_H
 
+#include "main.h"
 #include "struct_typedef.h"
 
 //when imu is calibrating ,buzzer set frequency and strength. 当imu在校准,蜂鸣器的设置频率和强度
-#define imu_start_buzzer()          buzzer_on(95, 10000)    
+#define imu_start_buzzer()          buzzer_on(95, 10000)
 //when gimbal is calibrating ,buzzer set frequency and strength.当云台在校准,蜂鸣器的设置频率和强度
-#define gimbal_start_buzzer()       buzzer_on(31, 19999)    
+#define gimbal_start_buzzer()       buzzer_on(31, 19999)
 #define cali_buzzer_off()           buzzer_off()            //buzzer off，关闭蜂鸣器
 
 
 //get stm32 chip temperature, to calc imu control temperature.获取stm32片内温度，计算imu的控制温度
-#define cali_get_mcu_temperature()  get_temprate()      
+#define cali_get_mcu_temperature()  get_temprate()
 
 
 
@@ -140,7 +141,7 @@
 
 #define CALI_SENSOR_HEAD_LEGHT  1
 
-#define SELF_ID                 0                   //ID 
+#define SELF_ID                 0                   //ID
 #define FIRMWARE_VERSION        12345               //handware version.
 #define CALIED_FLAG             0x55                // means it has been calibrated
 //you have 20 seconds to calibrate by remote control. 有20s可以用遥控器进行校准
@@ -153,11 +154,11 @@
 
 #define rc_cali_buzzer_middle_on()  gimbal_start_buzzer()
 #define rc_cali_buzzer_start_on()   imu_start_buzzer()
-#define RC_CMD_LONG_TIME            2000    
+#define RC_CMD_LONG_TIME            2000
 
-#define RCCALI_BUZZER_CYCLE_TIME    400        
-#define RC_CALI_BUZZER_PAUSE_TIME   200       
-#define RC_CALI_VALUE_HOLE          600     //remote control threshold, the max value of remote control channel is 660. 
+#define RCCALI_BUZZER_CYCLE_TIME    400
+#define RC_CALI_BUZZER_PAUSE_TIME   200
+#define RC_CALI_VALUE_HOLE          600     //remote control threshold, the max value of remote control channel is 660.
 
 
 #define GYRO_CALIBRATE_TIME         20000   //gyro calibrate time,陀螺仪校准时间

@@ -52,6 +52,7 @@
   
 #ifndef DETECT_TASK_H
 #define DETECT_TASK_H
+#include "main.h"
 #include "struct_typedef.h"
 
 
