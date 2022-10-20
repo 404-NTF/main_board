@@ -53,6 +53,7 @@ include_directories(Core/Inc USB_DEVICE/App USB_DEVICE/Target Drivers/STM32F4xx_
 include_directories(Core/app/Inc Core/app/protocol Core/bsp/Inc Core/components/algorithm Core/components/algorithm/Include Core/components/controller Core/components/devices Core/components/support)
 
 add_definitions(-DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_PRESENT=1U -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING)
+add_definitions(-Wno-attributes) # ignore warning: 'packed' attribute ignored'
 
 file(GLOB_RECURSE SOURCES "startup/*.*" "Library/*.*" "Middlewares/*.*" "Drivers/*.*" "USB_DEVICE/*.*" "Core/*.*")
 
