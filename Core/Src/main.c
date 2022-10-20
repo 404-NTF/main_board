@@ -181,8 +181,8 @@ void SystemClock_Config(void)
   }
 
   /** Initializes the RCC Oscillators according to the specified parameters
-   * in the RCC_OscInitTypeDef structure.
-   */
+  * in the RCC_OscInitTypeDef structure.
+  */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -208,6 +208,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
   /**
    * 禁用内部高速时钟
    * (怎么让CubeMX Generate的时候不删除这一段呢)
@@ -219,7 +220,6 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-
 }
 
 /* USER CODE BEGIN 4 */
