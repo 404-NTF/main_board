@@ -13,6 +13,7 @@
 #define OLED_H
 #include "struct_typedef.h"
 #include "oledfont.h"
+#include "main.h"
 
 
 // the I2C address of oled

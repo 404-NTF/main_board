@@ -3,18 +3,6 @@
 #include "string.h"
 
 /**
-  * @brief          get the sector number of flash
-  * @param[in]      address: flash address
-  * @retval         sector number
-  */
-/**
-  * @brief          获取flash的sector号
-  * @param[in]      address: flash 地址
-  * @retval         sector号
-  */
-static uint32_t ger_sector(uint32_t address);
-
-/**
   * @brief          erase flash
   * @param[in]      address: flash address
   * @param[in]      len: page num

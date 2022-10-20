@@ -1,5 +1,6 @@
 #ifndef USER_LIB_H
 #define USER_LIB_H
+#include "main.h"
 #include "struct_typedef.h"
 
 typedef __packed struct
