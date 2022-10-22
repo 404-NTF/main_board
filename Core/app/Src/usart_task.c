@@ -18,7 +18,7 @@ static void usart_init(uint8_t *rx1_buf, uint8_t *rx2_buf, uint16_t dma_buf_num)
 
 static void decode_rx_data(uint8_t *rx_bufs, uint16_t length);
 
-void usart_task(void const *pvParameters) {
+void usart_task(void *pvParameters) {
     usart_init(rx_buf[0], rx_buf[1], TOTAL_LENGTH);
     while (1)
     {

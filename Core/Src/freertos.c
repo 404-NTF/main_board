@@ -26,6 +26,16 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "calibrate_task.h"
+#include "chassis_task.h"
+#include "detect_task.h"
+#include "gimbal_task.h"
+#include "INS_task.h"
+#include "led_flow_task.h"
+#include "oled_task.h"
+#include "usb_task.h"
+#include "voltage_task.h"
+#include "usart_task.h"
 
 /* USER CODE END Includes */
 
@@ -55,6 +65,76 @@ const osThreadAttr_t test_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for calibrate */
+osThreadId_t calibrateHandle;
+const osThreadAttr_t calibrate_attributes = {
+  .name = "calibrate",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for chassis */
+osThreadId_t chassisHandle;
+const osThreadAttr_t chassis_attributes = {
+  .name = "chassis",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityAboveNormal,
+};
+/* Definitions for detect */
+osThreadId_t detectHandle;
+const osThreadAttr_t detect_attributes = {
+  .name = "detect",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for gimbal */
+osThreadId_t gimbalHandle;
+const osThreadAttr_t gimbal_attributes = {
+  .name = "gimbal",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityHigh,
+};
+/* Definitions for imu */
+osThreadId_t imuHandle;
+const osThreadAttr_t imu_attributes = {
+  .name = "imu",
+  .stack_size = 1024 * 4,
+  .priority = (osPriority_t) osPriorityRealtime,
+};
+/* Definitions for led */
+osThreadId_t ledHandle;
+const osThreadAttr_t led_attributes = {
+  .name = "led",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for oled */
+osThreadId_t oledHandle;
+const osThreadAttr_t oled_attributes = {
+  .name = "oled",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for usb */
+osThreadId_t usbHandle;
+const osThreadAttr_t usb_attributes = {
+  .name = "usb",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for voltage */
+osThreadId_t voltageHandle;
+const osThreadAttr_t voltage_attributes = {
+  .name = "voltage",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for usart */
+osThreadId_t usartHandle;
+const osThreadAttr_t usart_attributes = {
+  .name = "usart",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -62,6 +142,16 @@ const osThreadAttr_t test_attributes = {
 /* USER CODE END FunctionPrototypes */
 
 void test_task(void *argument);
+extern void calibrate_task(void *argument);
+extern void chassis_task(void *argument);
+extern void detect_task(void *argument);
+extern void gimbal_task(void *argument);
+extern void INS_task(void *argument);
+extern void led_RGB_flow_task(void *argument);
+extern void oled_task(void *argument);
+extern void usb_task(void *argument);
+extern void battery_voltage_task(void *argument);
+extern void usart_task(void *argument);
 
 extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -95,6 +185,36 @@ void MX_FREERTOS_Init(void) {
   /* Create the thread(s) */
   /* creation of test */
   testHandle = osThreadNew(test_task, NULL, &test_attributes);
+
+  /* creation of calibrate */
+  calibrateHandle = osThreadNew(calibrate_task, NULL, &calibrate_attributes);
+
+  /* creation of chassis */
+  chassisHandle = osThreadNew(chassis_task, NULL, &chassis_attributes);
+
+  /* creation of detect */
+  detectHandle = osThreadNew(detect_task, NULL, &detect_attributes);
+
+  /* creation of gimbal */
+  gimbalHandle = osThreadNew(gimbal_task, NULL, &gimbal_attributes);
+
+  /* creation of imu */
+  imuHandle = osThreadNew(INS_task, NULL, &imu_attributes);
+
+  /* creation of led */
+  ledHandle = osThreadNew(led_RGB_flow_task, NULL, &led_attributes);
+
+  /* creation of oled */
+  oledHandle = osThreadNew(oled_task, NULL, &oled_attributes);
+
+  /* creation of usb */
+  usbHandle = osThreadNew(usb_task, NULL, &usb_attributes);
+
+  /* creation of voltage */
+  voltageHandle = osThreadNew(battery_voltage_task, NULL, &voltage_attributes);
+
+  /* creation of usart */
+  usartHandle = osThreadNew(usart_task, NULL, &usart_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */

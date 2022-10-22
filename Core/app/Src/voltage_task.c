@@ -45,7 +45,7 @@ fp32 electricity_percentage;
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
-void battery_voltage_task(void const * argument)
+void battery_voltage_task(void *argument)
 {
     osDelay(1000);
     //use inner 1.2v to calbrate

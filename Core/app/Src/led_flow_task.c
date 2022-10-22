@@ -36,7 +36,7 @@ uint32_t RGB_flow_color[RGB_FLOW_COLOR_LENGHT + 1] = {0xFF0000FF, 0x0000FF00, 0x
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
-void led_RGB_flow_task(void const * argument)
+void led_RGB_flow_task(void *argument)
 {
     uint16_t i, j;
     fp32 delta_alpha, delta_red, delta_green, delta_blue;

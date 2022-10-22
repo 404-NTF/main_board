@@ -30,7 +30,7 @@
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
-extern void led_RGB_flow_task(void const * argument);
+extern void led_RGB_flow_task(void *argument);
 
 #endif
 

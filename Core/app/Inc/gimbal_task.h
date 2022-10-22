@@ -267,7 +267,7 @@ extern const gimbal_motor_t *get_pitch_motor_point(void);
   * @retval         none
   */
 
-extern void gimbal_task(void const *pvParameters);
+extern void gimbal_task(void *pvParameters);
 
 /**
   * @brief          gimbal cali calculate, return motor offset encode, max and min relative angle

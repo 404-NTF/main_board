@@ -30,6 +30,6 @@
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
-extern void oled_task(void const * argument);
+extern void oled_task(void *argument);
 
 #endif

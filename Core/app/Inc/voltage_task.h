@@ -32,7 +32,7 @@
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
-extern void battery_voltage_task(void const * argument);
+extern void battery_voltage_task(void *argument);
 
 /**
   * @brief          get electricity percentage

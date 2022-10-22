@@ -259,7 +259,7 @@ extern void get_flash_latitude(float *latitude);
   * @param[in]      pvParameters: 空
   * @retval         none
   */
-extern void calibrate_task(void const *pvParameters);
+extern void calibrate_task(void *pvParameters);
 
 
 #endif

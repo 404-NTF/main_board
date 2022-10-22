@@ -47,7 +47,7 @@ uint8_t timeout;
   * @retval         none
   */
 
-void INS_task(void const *pvParameters)
+void INS_task(void *pvParameters)
 {
     timeout = 0;
 

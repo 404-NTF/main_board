@@ -163,7 +163,7 @@ static uint32_t calibrate_systemTick;
   * @param[in]      pvParameters: 空
   * @retval         none
   */
-void calibrate_task(void const *pvParameters)
+void calibrate_task(void *pvParameters)
 {
   static uint8_t i = 0;
 

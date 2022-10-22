@@ -133,7 +133,7 @@ chassis_move_t chassis_move;
   * @param[in]      pvParameters: 空
   * @retval         none
   */
-void chassis_task(void const *pvParameters)
+void chassis_task(void *pvParameters)
 {
     //wait a time
     //空闲一段时间

@@ -195,7 +195,7 @@ typedef struct
   * @param[in]      pvParameters: 空
   * @retval         none
   */
-extern void chassis_task(void const *pvParameters);
+extern void chassis_task(void *pvParameters);
 
 /**
   * @brief          accroding to the channel value of remote control, calculate chassis vertical and horizontal speed set-point

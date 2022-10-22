@@ -3,6 +3,6 @@
 
 #define TOTAL_LENGTH 128
 
-extern void usart_task(void const *pvParameters);
+extern void usart_task(void *pvParameters);
 
 #endif

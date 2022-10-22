@@ -15,8 +15,6 @@
   ****************************(C) COPYRIGHT 2019 DJI****************************
   */
 
-#include "test_task.h"
-#include "main.h"
 #include "cmsis_os.h"
 #include "bsp_buzzer.h"
 #include "detect_task.h"
@@ -37,7 +35,7 @@ const error_t *error_list_test_local;
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
-void test_task(void const * argument)
+void test_task(void * argument)
 {
     static uint8_t error, last_error;
     static uint8_t error_num;

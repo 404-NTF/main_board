@@ -40,7 +40,7 @@
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
-extern void INS_task(void const *pvParameters);
+extern void INS_task(void *pvParameters);
 
 extern void set_init(void);
 

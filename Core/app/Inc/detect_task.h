@@ -107,7 +107,7 @@ typedef __packed struct
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
-extern void detect_task(void const *pvParameters);
+extern void detect_task(void *pvParameters);
 
 /**
   * @brief          get toe error status

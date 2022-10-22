@@ -21,6 +21,6 @@
 
 
 
-extern void usb_task(void const * argument);
+extern void usb_task(void *argument);
 
 #endif

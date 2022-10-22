@@ -44,7 +44,7 @@ static uint8_t refresh_tick = 0;
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
-void oled_task(void const * argument)
+void oled_task(void *argument)
 {
     uint8_t i;
     uint8_t show_col, show_row;
