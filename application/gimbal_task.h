@@ -33,8 +33,8 @@
 #include "remote_control.h"
 //pitch speed close-loop PID params, max out and max iout
 //pitch 速度环 PID参数以及 PID最大输出，积分输出
-#define PITCH_SPEED_PID_KP        -250.0f
-#define PITCH_SPEED_PID_KI        70.0f
+#define PITCH_SPEED_PID_KP        2900.0f
+#define PITCH_SPEED_PID_KI        60.0f
 #define PITCH_SPEED_PID_KD        0.0f
 #define PITCH_SPEED_PID_MAX_OUT   30000.0f
 #define PITCH_SPEED_PID_MAX_IOUT  10000.0f
@@ -50,7 +50,7 @@
 //pitch gyro angle close-loop PID params, max out and max iout
 //pitch 角度环 角度由陀螺仪解算 PID参数以及 PID最大输出，积分输出
 #define PITCH_GYRO_ABSOLUTE_PID_KP 15.0f
-#define PITCH_GYRO_ABSOLUTE_PID_KI 1.0f
+#define PITCH_GYRO_ABSOLUTE_PID_KI 0.0f
 #define PITCH_GYRO_ABSOLUTE_PID_KD 0.0f
 
 #define PITCH_GYRO_ABSOLUTE_PID_MAX_OUT 10.0f

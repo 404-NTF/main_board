@@ -67,6 +67,13 @@ void PID_init(pid_type_def *pid, uint8_t mode, const fp32 PID[3], fp32 max_out, 
 }
 
 /**
+  * @brief          pid calculate 
+  * @param[out]     pid: PID struct data point
+  * @param[in]      ref: feedback data 
+  * @param[in]      set: set point
+  * @retval         pid out
+  */
+/**
   * @brief          pid计算
   * @param[out]     pid: PID结构数据指针
   * @param[in]      ref: 反馈数据
