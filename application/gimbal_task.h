@@ -89,14 +89,6 @@
 #define PITCH_CHANNEL 3
 #define GIMBAL_MODE_CHANNEL 0
 
-//turn 180°
-//掉头180 按键
-#define TURN_KEYBOARD KEY_PRESSED_OFFSET_G
-//turn speed
-//掉头云台速度
-#define TURN_SPEED    0.04f
-//测试按键尚未使用
-#define TEST_KEYBOARD KEY_PRESSED_OFFSET_R
 //rocker value deadband
 //遥控器输入死区，因为遥控器存在差异，摇杆在中间，其值不一定为零
 #define RC_DEADBAND   10

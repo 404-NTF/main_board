@@ -559,7 +559,18 @@ static void chassis_no_follow_yaw_control(fp32 *vx_set, fp32 *vy_set, fp32 *wz_s
     }
 
     chassis_rc_to_control_vector(vx_set, vy_set, chassis_move_rc_to_vector);
-    *wz_set = -CHASSIS_WZ_RC_SEN * chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_WZ_CHANNEL];
+    
+    fp32 wz_offset = 0;
+    bool_t pressed = 0;
+    if (chassis_move_rc_to_vector->chassis_RC->key.v & LEFT_WZ_KEY) {
+        wz_offset += CHASSIS_WZ_RC_SEN * 511;
+        pressed = 1;
+    }
+    if (chassis_move_rc_to_vector->chassis_RC->key.v & RIGHT_WZ_KEY) {
+        wz_offset -= CHASSIS_WZ_RC_SEN * 511;
+        pressed = 1;
+    }
+    *wz_set = pressed ? wz_offset : -CHASSIS_WZ_RC_SEN * chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_WZ_CHANNEL];
 }
 
 /**

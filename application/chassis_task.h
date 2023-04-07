@@ -70,6 +70,10 @@
 
 #define MOTOR_DISTANCE_TO_CENTER 0.2f
 
+//按键底盘自转
+#define LEFT_WZ_KEY KEY_PRESSED_OFFSET_Q
+#define RIGHT_WZ_KEY KEY_PRESSED_OFFSET_E
+
 //chassis task control time  2ms
 //底盘任务控制间隔 2ms
 #define CHASSIS_CONTROL_TIME_MS 2
