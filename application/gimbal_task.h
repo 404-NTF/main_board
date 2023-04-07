@@ -233,22 +233,12 @@ typedef struct
 } gimbal_control_t;
 
 /**
-  * @brief          return yaw motor data point
-  * @param[in]      none
-  * @retval         yaw motor data point
-  */
-/**
   * @brief          返回yaw 电机数据指针
   * @param[in]      none
   * @retval         yaw电机指针
   */
 extern const gimbal_motor_t *get_yaw_motor_point(void);
 
-/**
-  * @brief          return pitch motor data point
-  * @param[in]      none
-  * @retval         pitch motor data point
-  */
 /**
   * @brief          返回pitch 电机数据指针
   * @param[in]      none

@@ -700,15 +700,6 @@ static void gimbal_absolute_angle_control(fp32 *yaw, fp32 *pitch, gimbal_control
     }
 }
 
-
-/**
-  * @brief          when gimbal behaviour mode is GIMBAL_RELATIVE_ANGLE, the function is called
-  *                 and gimbal control mode is encode mode. 
-  * @param[out]     yaw: yaw axia relative angle increment, unit rad
-  * @param[out]     pitch: pitch axia relative angle increment,unit rad
-  * @param[in]      gimbal_control_set: gimbal data
-  * @retval         none
-  */
 /**
   * @brief          云台编码值控制，电机是相对角度控制，
   * @param[in]      yaw: yaw轴角度控制，为角度的增量 单位 rad
@@ -727,20 +718,12 @@ static void gimbal_relative_angle_control(fp32 *yaw, fp32 *pitch, gimbal_control
     rc_deadband_limit(gimbal_control_set->gimbal_rc_ctrl->rc.ch[YAW_CHANNEL], yaw_channel, RC_DEADBAND);
     rc_deadband_limit(gimbal_control_set->gimbal_rc_ctrl->rc.ch[PITCH_CHANNEL], pitch_channel, RC_DEADBAND);
 
-    *yaw = yaw_channel * YAW_RC_SEN - gimbal_control_set->gimbal_rc_ctrl->mouse.x * YAW_MOUSE_SEN;
+    *yaw = yaw_channel * YAW_RC_SEN + gimbal_control_set->gimbal_rc_ctrl->mouse.x * YAW_MOUSE_SEN;
     *pitch = pitch_channel * PITCH_RC_SEN + gimbal_control_set->gimbal_rc_ctrl->mouse.y * PITCH_MOUSE_SEN;
 
 
 }
 
-/**
-  * @brief          when gimbal behaviour mode is GIMBAL_MOTIONLESS, the function is called
-  *                 and gimbal control mode is encode mode. 
-  * @param[out]     yaw: yaw axia relative angle increment,  unit rad
-  * @param[out]     pitch: pitch axia relative angle increment, unit rad
-  * @param[in]      gimbal_control_set: gimbal data
-  * @retval         none
-  */
 /**
   * @brief          云台进入遥控器无输入控制，电机是相对角度控制，
   * @author         RM
