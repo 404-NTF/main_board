@@ -29,6 +29,7 @@
 #include "gimbal_behaviour.h"
 #include "detect_task.h"
 #include "pid.h"
+#include "bsp_led.h"
 
 #define shoot_laser_on()    laser_on()      //激光开启宏定义
 #define shoot_laser_off()   laser_off()     //激光关闭宏定义
@@ -176,8 +177,8 @@ int16_t shoot_control_loop(void)
             shoot_control.given_current = 0;
         }
 
-        shoot_control.fric_mode = FRIC_MODE_ON;
-    }
+            shoot_control.fric_mode = FRIC_MODE_ON;
+        }
 
     switch (shoot_control.fric_mode)
     {
