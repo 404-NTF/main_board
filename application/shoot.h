@@ -42,19 +42,14 @@
 //遥控器射击开关打下档一段时间后 连续发射子弹 用于清单
 #define RC_S_LONG_TIME              2000
 //摩擦轮加速度
-#define FRIC_SPEED_ON               8000
-#define FRIC_SPEED_BACK             200
+#define FRIC_SPEED_ON               4000
 #define FRIC_SPEED_OFF              0
-//摩擦轮停止时间
-#define FRIC_STOP_TIME              8000
 //摩擦轮电机PID
 #define FRIC_PID_KP                 10.0f
 #define FRIC_PID_KI                 0.0f
 #define FRIC_PID_KD                 0.0f
-#define FRIC_PID_LEFT_MAX_OUT       10000.0f
-#define FRIC_PID_LEFT_MAX_IOUT      8000.0f
-#define FRIC_PID_RIGHT_MAX_OUT      -10000.0f
-#define FRIC_PID_RIGHT_MAX_IOUT     -8000.0f
+#define FRIC_PID_MAX_OUT            10000.0f
+#define FRIC_PID_MAX_IOUT           8000.0f
 //m3508转化成摩擦轮速度(m/s)的比例，
 #define M3508_MOTOR_RPM_TO_VECTOR   0.000415809748903494517209f
 #define FRIC_MOTOR_RPM_TO_VECTOR_SEN M3508_MOTOR_RPM_TO_VECTOR
@@ -165,7 +160,6 @@ typedef struct
 typedef struct {
   const motor_measure_t *fric_motor_measure;
   fp32 speed;
-  fp32 speed_set;
   int16_t give_current;
 } fric_motor_t;
 
@@ -173,6 +167,7 @@ typedef struct {
 typedef struct {
     fric_motor_t fric_moter[2];
     pid_type_def fric_motor_pid[2];
+    fp32 speed_set;
 } fric_control_t;
 
 //由于射击和云台使用同一个can的id故也射击任务在云台任务中执行

@@ -89,13 +89,12 @@ void shoot_init(void)
     PID_init(&shoot_control.trigger_motor_pid, PID_POSITION, Trigger_speed_pid, TRIGGER_READY_PID_MAX_OUT, TRIGGER_READY_PID_MAX_IOUT);
     uint8_t i;
     for (i = 0; i < 2; i++) {
+        PID_init(&fric_control.fric_motor_pid[i], PID_POSITION, Fric_speed_pid, FRIC_PID_MAX_OUT, FRIC_PID_MAX_IOUT);
         fric_control.fric_moter[i].fric_motor_measure = get_fric_motor_measure_point(i);
         fric_control.fric_moter[i].give_current = 0;
         fric_control.fric_moter[i].speed = 0.0f;
-        fric_control.fric_moter[i].speed_set = 0.0f;
     }
-    PID_init(&fric_control.fric_motor_pid[0], PID_POSITION, Fric_speed_pid, FRIC_PID_LEFT_MAX_OUT, FRIC_PID_LEFT_MAX_IOUT);
-    PID_init(&fric_control.fric_motor_pid[1], PID_POSITION, Fric_speed_pid, FRIC_PID_RIGHT_MAX_OUT, FRIC_PID_RIGHT_MAX_IOUT);
+    fric_control.speed_set = 0.0f;
     //更新数据
     shoot_feedback_update();
     shoot_control.fric_mode = FRIC_MODE_STOP;
@@ -192,25 +191,12 @@ int16_t shoot_control_loop(void)
         shoot_control.fric_mode = FRIC_MODE_ON;
     }
 
-    switch (shoot_control.fric_mode)
-    {
-    case FRIC_MODE_ON:
-        fric_control.fric_moter[0].speed_set = FRIC_SPEED_ON;
-        fric_control.fric_moter[1].speed_set = -FRIC_SPEED_ON;
-        break;
-    case FRIC_MODE_OFF:
-        // CAN_cmd_fric(-FRIC_SPEED_BACK, FRIC_SPEED_BACK);
-        if (shoot_control.fric_off_time == FRIC_STOP_TIME)
-        {
-            shoot_control.fric_mode = FRIC_MODE_STOP;
-        }
-        break;
-    case FRIC_MODE_STOP:
-    default:
-        fric_control.fric_moter[0].speed_set = FRIC_SPEED_OFF;
-        fric_control.fric_moter[1].speed_set = FRIC_SPEED_OFF;
-        break;
+    if (shoot_control.fric_mode == FRIC_MODE_ON) {
+        fric_control.speed_set = FRIC_SPEED_ON;
+    } else {
+        fric_control.speed_set = FRIC_SPEED_OFF;
     }
+    
 
     if (shoot_control.fric_mode == FRIC_MODE_OFF) {
         shoot_control.fric_off_time++;
@@ -220,11 +206,11 @@ int16_t shoot_control_loop(void)
 
     uint8_t i;
     for (i = 0; i < 2; i++) {
-        PID_calc(&fric_control.fric_motor_pid[i], fric_control.fric_moter[i].speed, fric_control.fric_moter[i].speed_set);
+        PID_calc(&fric_control.fric_motor_pid[i], fric_control.fric_moter[i].speed, fric_control.speed_set);
         fric_control.fric_moter[i].give_current = fric_control.fric_motor_pid[i].out;
     }
 
-    CAN_cmd_fric(fric_control.fric_moter[0].give_current, fric_control.fric_moter[1].give_current);    
+    CAN_cmd_fric(fric_control.fric_moter[0].give_current, -fric_control.fric_moter[1].give_current);    
 
     return shoot_control.given_current;
 }
@@ -348,10 +334,8 @@ static void shoot_feedback_update(void)
     speed_fliter_3 = speed_fliter_2 * fliter_num[0] + speed_fliter_1 * fliter_num[1] + (shoot_control.shoot_motor_measure->speed_rpm * MOTOR_RPM_TO_SPEED) * fliter_num[2];
     shoot_control.speed = speed_fliter_3;
 
-    uint8_t i;
-    for (i = 0; i < 2; i++) {
-        fric_control.fric_moter[i].speed = FRIC_MOTOR_RPM_TO_VECTOR_SEN * fric_control.fric_moter[i].fric_motor_measure->speed_rpm;
-    }
+    fric_control.fric_moter[0].speed = FRIC_MOTOR_RPM_TO_VECTOR_SEN * fric_control.fric_moter[0].fric_motor_measure->speed_rpm;
+    fric_control.fric_moter[1].speed = -FRIC_MOTOR_RPM_TO_VECTOR_SEN * fric_control.fric_moter[1].fric_motor_measure->speed_rpm;
     
     //电机圈数重置， 因为输出轴旋转一圈， 电机轴旋转 36圈，将电机轴数据处理成输出轴数据，用于控制输出轴角度
     if (shoot_control.shoot_motor_measure->ecd - shoot_control.shoot_motor_measure->last_ecd > HALF_ECD_RANGE)
