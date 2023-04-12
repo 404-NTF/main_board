@@ -100,7 +100,6 @@ void shoot_init(void)
     shoot_control.fric_mode = FRIC_MODE_STOP;
     shoot_control.bullet_box_mode = BOX_OFF_DONE;
     shoot_control.laser_mode = LASER_MODE_OFF;
-    shoot_control.fric_off_time = 0;
     shoot_control.ecd_count = 0;
     shoot_control.angle = shoot_control.shoot_motor_measure->ecd * MOTOR_ECD_TO_ANGLE;
     shoot_control.given_current = 0;
@@ -196,14 +195,6 @@ int16_t shoot_control_loop(void)
     } else {
         fric_control.speed_set = FRIC_SPEED_OFF;
     }
-    
-
-    if (shoot_control.fric_mode == FRIC_MODE_OFF) {
-        shoot_control.fric_off_time++;
-    } else {
-        shoot_control.fric_off_time = 0;
-    }
-
     uint8_t i;
     for (i = 0; i < 2; i++) {
         PID_calc(&fric_control.fric_motor_pid[i], fric_control.fric_moter[i].speed, fric_control.speed_set);
@@ -334,8 +325,8 @@ static void shoot_feedback_update(void)
     speed_fliter_3 = speed_fliter_2 * fliter_num[0] + speed_fliter_1 * fliter_num[1] + (shoot_control.shoot_motor_measure->speed_rpm * MOTOR_RPM_TO_SPEED) * fliter_num[2];
     shoot_control.speed = speed_fliter_3;
 
-    fric_control.fric_moter[0].speed = FRIC_MOTOR_RPM_TO_VECTOR_SEN * fric_control.fric_moter[0].fric_motor_measure->speed_rpm;
-    fric_control.fric_moter[1].speed = -FRIC_MOTOR_RPM_TO_VECTOR_SEN * fric_control.fric_moter[1].fric_motor_measure->speed_rpm;
+    fric_control.fric_moter[0].speed = fric_control.fric_moter[0].fric_motor_measure->speed_rpm;
+    fric_control.fric_moter[1].speed = -fric_control.fric_moter[1].fric_motor_measure->speed_rpm;
     
     //电机圈数重置， 因为输出轴旋转一圈， 电机轴旋转 36圈，将电机轴数据处理成输出轴数据，用于控制输出轴角度
     if (shoot_control.shoot_motor_measure->ecd - shoot_control.shoot_motor_measure->last_ecd > HALF_ECD_RANGE)

@@ -42,7 +42,7 @@
 //遥控器射击开关打下档一段时间后 连续发射子弹 用于清单
 #define RC_S_LONG_TIME              2000
 //摩擦轮加速度
-#define FRIC_SPEED_ON               4000
+#define FRIC_SPEED_ON               5000
 #define FRIC_SPEED_OFF              0
 //摩擦轮电机PID
 #define FRIC_PID_KP                 10.0f
@@ -148,7 +148,6 @@ typedef struct
     uint16_t rc_s_time;
     uint16_t press_r_time;
 
-    uint16_t fric_off_time;
     uint16_t bullet_time;
     uint16_t block_time;
     uint16_t reverse_time;
