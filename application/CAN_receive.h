@@ -152,5 +152,7 @@ extern const motor_measure_t *get_trigger_motor_measure_point(void);
   */
 extern const motor_measure_t *get_chassis_motor_measure_point(uint8_t i);
 
+extern const motor_measure_t *get_fric_motor_measure_point(uint8_t i);
+
 
 #endif

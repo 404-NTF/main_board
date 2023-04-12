@@ -90,8 +90,7 @@ void shoot_init(void)
     uint8_t i;
     for (i = 0; i < 2; i++) {
         fric_control.fric_moter[i].fric_motor_measure = get_fric_motor_measure_point(i);
-        fric_control.fric_moter[i].given_current = 0;
-        fric_control.fric_moter[i].accel = 0.0f;
+        fric_control.fric_moter[i].give_current = 0;
         fric_control.fric_moter[i].speed = 0.0f;
         fric_control.fric_moter[i].speed_set = 0.0f;
     }
