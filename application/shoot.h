@@ -47,6 +47,17 @@
 #define FRIC_SPEED_OFF              0
 //摩擦轮停止时间
 #define FRIC_STOP_TIME              8000
+//摩擦轮电机PID
+#define FRIC_PID_KP                 10.0f
+#define FRIC_PID_KI                 0.0f
+#define FRIC_PID_KD                 0.0f
+#define FRIC_PID_LEFT_MAX_OUT       10000.0f
+#define FRIC_PID_LEFT_MAX_IOUT      8000.0f
+#define FRIC_PID_RIGHT_MAX_OUT      -10000.0f
+#define FRIC_PID_RIGHT_MAX_IOUT     -8000.0f
+//m3508转化成摩擦轮速度(m/s)的比例，
+#define M3508_MOTOR_RPM_TO_VECTOR   0.000415809748903494517209f
+#define FRIC_MOTOR_RPM_TO_VECTOR_SEN M3508_MOTOR_RPM_TO_VECTOR
 //电机反馈码盘值范围
 #define HALF_ECD_RANGE              4096
 #define ECD_RANGE                   8191
@@ -150,6 +161,19 @@ typedef struct
     uint16_t heat_limit;
     uint16_t heat;
 } shoot_control_t;
+
+typedef struct {
+  const motor_measure_t *fric_motor_measure;
+  fp32 speed;
+  fp32 speed_set;
+  int16_t give_current;
+} fric_motor_t;
+
+
+typedef struct {
+    fric_motor_t fric_moter[2];
+    pid_type_def fric_motor_pid[2];
+} fric_control_t;
 
 //由于射击和云台使用同一个can的id故也射击任务在云台任务中执行
 extern void shoot_init(void);
