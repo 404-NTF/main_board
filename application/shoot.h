@@ -100,7 +100,7 @@ typedef enum
     SHOOT_READY,
     SHOOT_BULLET,
     SHOOT_BULLET_ONCE,
-    SHOOT_CONTINUE_BULLET,
+    // SHOOT_CONTINUE_BULLET,
 } shoot_mode_e;
 
 typedef enum
