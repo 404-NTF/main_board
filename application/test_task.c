@@ -28,11 +28,6 @@ const error_t *error_list_test_local;
 
 
 /**
-  * @brief          test task
-  * @param[in]      pvParameters: NULL
-  * @retval         none
-  */
-/**
   * @brief          test任务
   * @param[in]      pvParameters: NULL
   * @retval         none
@@ -46,8 +41,6 @@ void test_task(void const * argument)
     while(1)
     {
         error = 0;
-
-        //find error
         //发现错误
         for(error_num = 0; error_num < REFEREE_TOE; error_num++)
         {
@@ -58,13 +51,11 @@ void test_task(void const * argument)
             }
         }
 
-        //no error, stop buzzer
         //没有错误, 停止蜂鸣器
         if(error == 0 && last_error != 0)
         {
             buzzer_off();
         }
-        //have error
         //有错误
         if(error)
         {
@@ -77,11 +68,6 @@ void test_task(void const * argument)
 }
 
 
-/**
-  * @brief          make the buzzer sound
-  * @param[in]      num: the number of beeps 
-  * @retval         none
-  */
 /**
   * @brief          使得蜂鸣器响
   * @param[in]      num:响声次数
@@ -105,13 +91,13 @@ static void buzzer_warn_error(uint8_t num)
     {
         static uint8_t tick = 0;
         tick++;
-        if(tick < 50)
+        if(tick < BUZZER_TIME)
         {
             buzzer_off();
         }
-        else if(tick < 100)
+        else if(tick < BUZZER_TIME * 2)
         {
-            buzzer_on(1, 30000);
+            buzzer_on(1, BUZZER_VOICE);
         }
         else
         {

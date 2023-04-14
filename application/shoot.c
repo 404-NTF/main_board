@@ -152,12 +152,12 @@ int16_t shoot_control_loop(void)
         shoot_control.trigger_speed_set = TRIGGER_SPEED;
         trigger_motor_turn_back();
     }
-    else if (shoot_control.shoot_mode == SHOOT_CONTINUE_BULLET)
-    {
-        //设置拨弹轮的拨动速度,并开启堵转反转处理
-        shoot_control.trigger_speed_set = CONTINUE_TRIGGER_SPEED;
-        trigger_motor_turn_back();
-    }
+    // else if (shoot_control.shoot_mode == SHOOT_CONTINUE_BULLET)
+    // {
+    //     //设置拨弹轮的拨动速度,并开启堵转反转处理
+    //     shoot_control.trigger_speed_set = CONTINUE_TRIGGER_SPEED;
+    //     trigger_motor_turn_back();
+    // }
 
     if(shoot_control.shoot_mode == SHOOT_STOP)
     {
@@ -276,12 +276,13 @@ static void shoot_set_mode(void)
     
     if (shoot_control.shoot_mode > SHOOT_READY)
     {
-        //鼠标长按一直进入射击状态 保持连发
-        if ((shoot_control.press_r_time == PRESS_LONG_TIME) || (shoot_control.rc_s_time == RC_S_LONG_TIME))
-        {
-            shoot_control.shoot_mode = SHOOT_CONTINUE_BULLET;
-        }
-        else if(!switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !shoot_control.press_l && !shoot_control.press_r)
+        // //鼠标长按一直进入射击状态 保持连发
+        // if ((shoot_control.press_r_time == PRESS_LONG_TIME) || (shoot_control.rc_s_time == RC_S_LONG_TIME))
+        // {
+        //     shoot_control.shoot_mode = SHOOT_CONTINUE_BULLET;
+        // }
+        // else 
+        if(!switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !shoot_control.press_l && !shoot_control.press_r)
         {
             shoot_control.shoot_mode = SHOOT_READY;
         }

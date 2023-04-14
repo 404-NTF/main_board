@@ -239,11 +239,6 @@ extern const gimbal_motor_t *get_yaw_motor_point(void);
 extern const gimbal_motor_t *get_pitch_motor_point(void);
 
 /**
-  * @brief          gimbal task, osDelay GIMBAL_CONTROL_TIME (1ms) 
-  * @param[in]      pvParameters: null
-  * @retval         none
-  */
-/**
   * @brief          云台任务，间隔 GIMBAL_CONTROL_TIME 1ms
   * @param[in]      pvParameters: 空
   * @retval         none
@@ -251,16 +246,6 @@ extern const gimbal_motor_t *get_pitch_motor_point(void);
 
 extern void gimbal_task(void const *pvParameters);
 
-/**
-  * @brief          gimbal cali calculate, return motor offset encode, max and min relative angle
-  * @param[out]     yaw_offse:yaw middle place encode
-  * @param[out]     pitch_offset:pitch place encode
-  * @param[out]     max_yaw:yaw max relative angle
-  * @param[out]     min_yaw:yaw min relative angle
-  * @param[out]     max_yaw:pitch max relative angle
-  * @param[out]     min_yaw:pitch min relative angle
-  * @retval         none
-  */
 /**
   * @brief          云台校准计算，将校准记录的中值,最大 最小值返回
   * @param[out]     yaw 中值 指针
@@ -274,16 +259,6 @@ extern void gimbal_task(void const *pvParameters);
   */
 extern bool_t cmd_cali_gimbal_hook(uint16_t *yaw_offset, uint16_t *pitch_offset, fp32 *max_yaw, fp32 *min_yaw, fp32 *max_pitch, fp32 *min_pitch);
 
-/**
-  * @brief          gimbal cali data, set motor offset encode, max and min relative angle
-  * @param[in]      yaw_offse:yaw middle place encode
-  * @param[in]      pitch_offset:pitch place encode
-  * @param[in]      max_yaw:yaw max relative angle
-  * @param[in]      min_yaw:yaw min relative angle
-  * @param[in]      max_yaw:pitch max relative angle
-  * @param[in]      min_yaw:pitch min relative angle
-  * @retval         none
-  */
 /**
   * @brief          云台校准设置，将校准的云台中值以及最小最大机械相对角度
   * @param[in]      yaw_offse:yaw 中值
