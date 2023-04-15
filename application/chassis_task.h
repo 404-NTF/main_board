@@ -47,7 +47,7 @@
 //不跟随云台的时候 遥控器的yaw遥杆（max 660）转化成车体旋转速度的比例
 #define CHASSIS_WZ_RC_SEN 0.01f
 //不跟随云台的时候 鼠标的左右移动（max 660）转化成车体旋转速度的比例
-#define MOUSE_WZ_RC_SEN 0.04f
+#define MOUSE_WZ_RC_SEN 0.08f
 
 #define CHASSIS_ACCEL_X_NUM 0.1666666667f
 #define CHASSIS_ACCEL_Y_NUM 0.3333333333f
